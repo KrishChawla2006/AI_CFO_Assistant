@@ -1,0 +1,2070 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced AI CFO Assistant</title>
+    <!-- CSS Libraries -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #2c3e50; /* Dark Blue Gray */
+            --secondary-color: #3498db; /* Bright Blue */
+            --success-color: #27ae60; /* Emerald Green */
+            --warning-color: #f39c12; /* Orange */
+            --danger-color: #e74c3c; /* Red */
+            --info-color: #17a2b8; /* Cyan */
+            --light-bg: #f8f9fa; /* Light Gray */
+            --dark-bg: #343a40; /* Dark Gray */
+            --accent-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Purple-Blue */
+        }
+       
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--accent-gradient);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+       
+        .navbar-custom {
+            background: var(--primary-color);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+        .navbar-custom .navbar-brand {
+            color: white;
+            font-weight: 700;
+            font-size: 1.8rem;
+        }
+        .navbar-custom .navbar-brand i {
+            margin-right: 10px;
+            color: var(--secondary-color);
+        }
+        .navbar-custom .nav-link {
+            color: rgba(255,255,255,0.7);
+            margin-left: 15px;
+            transition: color 0.3s ease;
+        }
+        .navbar-custom .nav-link:hover {
+            color: white;
+        }
+        .navbar-custom .user-info {
+            color: white;
+            font-weight: 500;
+            margin-left: 20px;
+            display: flex;
+            align-items: center;
+        }
+        .navbar-custom .user-info i {
+            margin-right: 8px;
+            color: var(--success-color);
+        }
+
+        .main-container {
+            min-width: 90%;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            margin: 20px auto;
+            padding: 0;
+            overflow: hidden;
+            max-width: 1600px; /* Increased max-width for more content */
+            flex-grow: 1; /* Allow container to grow */
+        }
+       
+        .header-section {
+            
+            width: 100%;
+            background: var(--accent-gradient);
+            color: white;
+            padding: 40px; /* Increased padding */
+            text-align: center;
+        }
+       
+        .header-title {
+            font-size: 3rem; /* Larger title */
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+        }
+       
+        .header-subtitle {
+            font-size: 1.3rem;
+            opacity: 0.9;
+        }
+       
+        .upload-section {
+            padding: 40px; /* Increased padding */
+            background: white;
+            border-bottom: 1px solid #e9ecef;
+        }
+       
+        .drop-zone {
+            border: 3px dashed var(--secondary-color);
+            border-radius: 15px;
+            padding: 60px 20px; /* Increased padding */
+            text-align: center;
+            transition: all 0.3s ease;
+            background: linear-gradient(45deg, #f0f4f8, #e3e9ef);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+       
+        .drop-zone::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(52, 152, 219, 0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.5s ease;
+            opacity: 0;
+        }
+       
+        .drop-zone:hover::before {
+            opacity: 1;
+            transform: rotate(45deg) translate(50%, 50%);
+        }
+       
+        .drop-zone.dragover {
+            border-color: var(--success-color);
+            background: linear-gradient(45deg, #d4edda, #c3e6cb);
+            transform: scale(1.02);
+            box-shadow: 0 0 15px rgba(39, 174, 96, 0.3);
+        }
+       
+        .drop-zone-content {
+            position: relative;
+            z-index: 2;
+        }
+       
+        .drop-zone i {
+            font-size: 4.5rem; /* Larger icon */
+            margin-bottom: 25px;
+            display: block;
+            color: var(--secondary-color);
+        }
+       
+        .file-input {
+            display: none;
+        }
+       
+        .file-preview {
+            margin-top: 30px;
+        }
+       
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: var(--light-bg);
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            animation: slideInRight 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+       
+        .file-item:last-child {
+            margin-bottom: 0;
+        }
+       
+        .file-info {
+            display: flex;
+            align-items: center;
+        }
+       
+        .file-icon {
+            font-size: 1.5rem;
+            margin-right: 15px;
+        }
+       
+        .remove-file {
+            color: var(--danger-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+        }
+       
+        .remove-file:hover {
+            transform: scale(1.2);
+        }
+       
+        .action-buttons {
+            display: flex;
+            gap: 20px; /* Increased gap */
+            justify-content: center;
+            margin-top: 35px; /* Increased margin */
+        }
+       
+        .btn-custom {
+            padding: 14px 35px; /* Increased padding */
+            border-radius: 30px; /* More rounded */
+            border: none;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+       
+        .btn-custom::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.4s ease;
+        }
+       
+        .btn-custom:hover::before {
+            width: 300px;
+            height: 300px;
+            opacity: 1;
+        }
+       
+        .btn-analyze {
+            background: linear-gradient(45deg, var(--success-color), #28a745);
+            color: white;
+        }
+       
+        .btn-demo {
+            background: linear-gradient(45deg, var(--info-color), #138496);
+            color: white;
+        }
+        .btn-clear {
+            background: linear-gradient(45deg, #6c757d, #5a6268);
+            color: white;
+        }
+       
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85); /* Darker overlay */
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            animation: fadeIn 0.3s ease;
+        }
+       
+        .loading-content {
+            text-align: center;
+            color: white;
+            padding: 50px; /* Increased padding */
+            border-radius: 20px;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(15px); /* Stronger blur */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+       
+        .loading-spinner {
+            width: 90px; /* Larger spinner */
+            height: 90px;
+            border: 5px solid rgba(255,255,255,0.3);
+            border-top: 5px solid white;
+            border-radius: 50%;
+            animation: spin 1.2s linear infinite; /* Slower spin */
+            margin: 0 auto 25px;
+        }
+       
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+       
+        .loading-text {
+            font-size: 1.8rem; /* Larger text */
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+       
+        .loading-progress {
+            width: 400px; /* Wider progress bar */
+            height: 6px; /* Thicker progress bar */
+            background: rgba(255,255,255,0.3);
+            border-radius: 3px;
+            margin: 25px auto;
+            overflow: hidden;
+        }
+       
+        @keyframes progress {
+            0% { width: 0%; }
+            50% { width: 70%; }
+            100% { width: 100%; }
+        }
+       
+        .results-section {
+            display: none;
+            padding: 0;
+            min-height: 600px; /* Ensure sufficient height */
+        }
+       
+        .results-nav {
+            background: var(--dark-bg);
+            padding: 0;
+            border-top-left-radius: 20px; /* Match main container */
+            border-top-right-radius: 20px;
+        }
+       
+        .nav-pills .nav-link {
+            color: #adb5bd;
+            border-radius: 0;
+            padding: 18px 25px; /* More padding */
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+       
+        .nav-pills .nav-link.active {
+            background: var(--secondary-color);
+            color: white;
+            box-shadow: 0 0 15px rgba(52, 152, 219, 0.4);
+        }
+       
+        .nav-pills .nav-link:hover:not(.active) {
+            background: rgba(52, 152, 219, 0.15);
+            color: white;
+        }
+       
+        .tab-content {
+            padding: 30px;
+            background: white; /* Ensure background for tabs */
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            min-width: 90%;
+        }
+       
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(200px, 1fr)); /* Adjusted minmax */
+            gap: 25px; /* Increased gap */
+            margin-bottom: 35px;
+        }
+       
+        .kpi-card {
+            background: white;
+            padding: 30px; /* Increased padding */
+            border-radius: 18px; /* More rounded */
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            border: 1px solid #e9ecef;
+        }
+       
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px; /* Thicker border */
+            background: linear-gradient(90deg, var(--secondary-color), var(--success-color));
+        }
+       
+        .kpi-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.18);
+        }
+       
+        .kpi-icon {
+            font-size: 3rem; /* Larger icon */
+            margin-bottom: 18px;
+            color: var(--secondary-color);
+        }
+       
+        .kpi-value {
+            font-size: 2.2rem; /* Larger value */
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+       
+        .kpi-label {
+            color: #6c757d;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 500;
+        }
+       
+        .chart-container {
+            min-width: 400px;
+            background: white;
+            border-radius: 18px;
+            padding: 60px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border: 1px solid #e9ecef;
+        }
+        .chart-container h5 {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+       
+        .risk-alert {
+            padding: 25px; /* Increased padding */
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 6px solid; /* Thicker border */
+            animation: slideInLeft 0.5s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+       
+        .risk-critical { background: #fee8e8; border-left-color: var(--danger-color); color: #721c24; }
+        .risk-high { background: #fff8e8; border-left-color: var(--warning-color); color: #856404; }
+        .risk-medium { background: #e8f3f8; border-left-color: var(--info-color); color: #0c5460; }
+        .risk-low { background: #e8f8e8; border-left-color: var(--success-color); color: #155724; }
+       
+        .chat-section {
+            background: white;
+            border-radius: 18px;
+            padding: 0;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            overflow: hidden;
+            height: 600px; /* Fixed height for chat */
+            display: flex;
+            flex-direction: column;
+        }
+       
+        .chat-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+       
+        .chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+       
+        .message {
+            margin-bottom: 15px;
+            animation: fadeInUp 0.3s ease;
+        }
+       
+        .message-user {
+            text-align: right;
+        }
+       
+        .message-bot {
+            text-align: left;
+        }
+       
+        .message-bubble {
+            display: inline-block;
+            padding: 12px 18px;
+            border-radius: 20px;
+            max-width: 75%; /* Wider bubble */
+            word-wrap: break-word;
+            line-height: 1.5;
+        }
+       
+        .message-user .message-bubble {
+            background: var(--secondary-color);
+            color: white;
+        }
+       
+        .message-bot .message-bubble {
+            background: white;
+            color: var(--primary-color);
+            border: 1px solid #e9ecef;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+       
+        .chat-input-section {
+            padding: 20px;
+            border-top: 1px solid #e9ecef;
+            background: white;
+        }
+       
+        .chat-input {
+            border: 1px solid #e9ecef;
+            border-radius: 25px;
+            padding: 12px 20px;
+            resize: none;
+            max-height: 150px; /* Limit chat input height */
+            overflow-y: auto;
+        }
+       
+        .chat-input:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+       
+        .send-button {
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+        }
+       
+        .send-button:hover {
+            background: var(--primary-color);
+            transform: scale(1.1);
+        }
+       
+        .export-section {
+            background: var(--light-bg);
+            padding: 30px;
+            border-radius: 18px;
+            margin-top: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+       
+        .export-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap; /* Allow wrapping */
+        }
+       
+        .btn-export {
+            padding: 12px 30px;
+            border: 2px solid;
+            border-radius: 25px;
+            background: transparent;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            min-width: 150px; /* Ensure buttons are wide enough */
+        }
+       
+        .btn-export-json { border-color: var(--info-color); color: var(--info-color); }
+        .btn-export-json:hover { background: var(--info-color); color: white; }
+       
+        .btn-export-excel { border-color: var(--success-color); color: var(--success-color); }
+        .btn-export-excel:hover { background: var(--success-color); color: white; }
+       
+        .btn-export-pdf { border-color: var(--danger-color); color: var(--danger-color); }
+        .btn-export-pdf:hover { background: var(--danger-color); color: white; }
+
+        .btn-download-exported {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            font-weight: 500;
+        }
+        .btn-download-exported:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+       
+        .comparison-table {
+            background: white;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            margin-top: 30px;
+            border: 1px solid #e9ecef;
+        }
+       
+        .table th {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 18px;
+            font-weight: 600;
+        }
+       
+        .table td {
+            padding: 18px;
+            vertical-align: middle;
+            font-size: 0.95rem;
+        }
+       
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(52, 152, 219, 0.03);
+        }
+       
+        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideInLeft { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeInUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+       
+        .status-online { background: var(--success-color); box-shadow: 0 0 0 2px rgba(39, 174, 96, 0.3); }
+        .status-processing { background: var(--warning-color); animation: pulse 1.5s ease-in-out infinite; }
+       
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+       
+        .tooltip-custom {
+            position: relative;
+            cursor: help;
+        }
+       
+        .tooltip-custom::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--dark-bg);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+        }
+       
+        .tooltip-custom:hover::after {
+            opacity: 1;
+        }
+       
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            z-index: 10000;
+            animation: slideInRight 0.3s ease;
+            max-width: 380px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+       
+        .notification.success { background: var(--success-color); }
+        .notification.error { background: var(--danger-color); }
+        .notification.info { background: var(--info-color); }
+        .notification.warning { background: var(--warning-color); }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--secondary-color);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Processing Financial Data</div>
+            <div class="loading-progress">
+                <div class="loading-progress-bar"></div>
+            </div>
+            <p id="loadingStatus">Initializing AI analysis...</p>
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-chart-line"></i> AI CFO Assistant
+            </a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <!-- Future links can go here -->
+                     
+                </ul>
+                <div class="d-flex align-items-center">
+                    <div id="userInfo" class="user-info">
+                        <!-- User info dynamically loaded here -->
+                    </div>
+                    <ul class="navbar-nav">
+                        <li class="nav-item" id="loginSignupNav">
+                            <a class="nav-link" href="/login"><i class="fas fa-sign-in-alt"></i> Login</a>
+                        </li>
+                        <li class="nav-item" id="logoutNav" style="display: none;">
+                            <a class="nav-link" href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid d-flex flex-column flex-grow-1">
+        <div class="main-container">
+            <!-- Header Section -->
+            <div class="header-section animate__animated animate__fadeInDown">
+                <h1 class="header-title">
+                    <i class="fas fa-robot"></i> AI CFO Assistant
+                    <span class="badge bg-success ms-2">Pro</span>
+                </h1>
+                <p class="header-subtitle">
+                    Advanced Financial Analysis & Predictive Intelligence Platform
+                </p>
+                <div class="mt-3">
+                    <span class="status-indicator status-online"></span>
+                    <small>AI Models Active</small>
+                </div>
+            </div>
+            <!-- Upload Section -->
+            <div class="upload-section animate__animated animate__fadeInUp">
+                <h3 class="text-center mb-4 text-primary">
+                    <i class="fas fa-upload"></i> Upload Financial Documents
+                </h3>
+                <div class="drop-zone" id="dropZone">
+                    <div class="drop-zone-content">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <h4>Drag & Drop Files Here</h4>
+                        <p>or click to browse</p>
+                        <p class="text-muted">
+                            Supports PDF, Excel (.xlsx, .xls), and CSV files
+                            <br>Maximum file size: 500MB per file
+                        </p>
+                    </div>
+                    <input type="file" id="fileInput" class="file-input" multiple accept=".pdf,.xlsx,.xls,.csv">
+                </div>
+                <div class="file-preview" id="filePreview"></div>
+                <div class="action-buttons">
+                    <button type="button" class="btn btn-custom btn-analyze" id="analyzeBtn" disabled>
+                        <i class="fas fa-brain"></i> Analyze with AI
+                    </button>
+                    <button type="button" class="btn btn-custom btn-demo" id="demoBtn">
+                        <i class="fas fa-rocket"></i> Try Demo
+                    </button>
+                    <button type="button" class="btn btn-custom btn-clear" id="clearBtn">
+                        <i class="fas fa-trash"></i> Clear All
+                    </button>
+                </div>
+            </div>
+            <!-- Results Section -->
+            <div class="results-section" id="resultsSection">
+                <!-- Navigation Tabs -->
+                <nav class="results-nav">
+                    <div class="nav nav-pills" id="resultsTabs" role="tablist">
+                        <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#dashboard" type="button" role="tab" aria-controls="dashboard" aria-selected="true">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </button>
+                        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#charts" type="button" role="tab" aria-controls="charts" aria-selected="false">
+                            <i class="fas fa-chart-bar"></i> Analytics
+                        </button>
+                        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#risks" type="button" role="tab" aria-controls="risks" aria-selected="false">
+                            <i class="fas fa-exclamation-triangle"></i> Risk Analysis
+                        </button>
+                        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#predictions" type="button" role="tab" aria-controls="predictions" aria-selected="false">
+                            <i class="fas fa-crystal-ball"></i> Predictions
+                        </button>
+                        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#chat" type="button" role="tab" aria-controls="chat" aria-selected="false">
+                            <i class="fas fa-comments"></i> AI Chat
+                        </button>
+                        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#reports" type="button" role="tab" aria-controls="reports" aria-selected="false">
+                            <i class="fas fa-file-alt"></i> Reports
+                        </button>
+                    </div>
+                </nav>
+                <!-- Tab Content -->
+                <div class="tab-content" id="resultsTabContent">
+                    <!-- Dashboard Tab -->
+                    <div class="tab-pane fade show active" id="dashboard" role="tabpanel">
+                        <h4 class="text-primary mb-4"><i class="fas fa-tachometer-alt"></i> Financial Health Dashboard</h4>
+                        <div class="kpi-grid" id="kpiGrid">
+                            <!-- KPI cards will be dynamically inserted here -->
+                        </div>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="chart-container">
+                                    <h5>Financial Overview</h5>
+                                    <div id="financialOverviewChart"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="chart-container">
+                                    <h5>Health Score</h5>
+                                    <div id="healthScoreGauge"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Charts Tab -->
+                    <div class="tab-pane fade" id="charts" role="tabpanel">
+                        <h4 class="text-primary mb-4"><i class="fas fa-chart-bar"></i> Advanced Analytics</h4>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="chart-container">
+                                    <h5>KPI Performance vs Targets</h5>
+                                    <div id="kpiComparisonChart"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="chart-container">
+                                    <h5>Revenue Forecast - Multiple Scenarios</h5>
+                                    <div id="revenueScenariosChart"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="chart-container">
+                                    <h5>Cash Flow Analysis</h5>
+                                    <div id="cashFlowAnalysisChart"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="chart-container">
+                                    <h5>Profitability Trend Forecast</h5>
+                                    <div id="profitabilityTrendChart"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="chart-container" id="companyComparisonContainer" style="display: none;">
+                                    <h5>Company Comparison Analysis</h5>
+                                    <div id="companyComparisonChart"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Risk Analysis Tab -->
+                    <div class="tab-pane fade" id="risks" role="tabpanel">
+                        <h4 class="text-primary mb-4"><i class="fas fa-exclamation-triangle"></i> Risk Analysis & Recommendations</h4>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div id="riskAlerts">
+                                    <!-- Risk alerts will be dynamically inserted here -->
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="chart-container">
+                                    <h5>Risk Distribution</h5>
+                                    <div id="riskDistributionChart"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Predictions Tab -->
+                    <div class="tab-pane fade" id="predictions" role="tabpanel">
+                        <h4 class="text-primary mb-4"><i class="fas fa-crystal-ball"></i> AI-Powered Predictions (Next 5 Years)</h4>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="chart-container">
+                                    <h5>Revenue Forecast</h5>
+                                    <div id="revenueForecastChart"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="chart-container">
+                                    <h5>Cash Flow Projection</h5>
+                                    <div id="cashFlowProjectionChart"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="chart-container">
+                                    <h5>Profit Prediction Analysis</h5>
+                                    <div id="profitPredictionChart"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Chat Tab -->
+                    <div class="tab-pane fade" id="chat" role="tabpanel">
+                        <div class="chat-section">
+                            <div class="chat-header">
+                                <i class="fas fa-robot"></i> AI Financial Advisor
+                                <span class="status-indicator status-online ms-2"></span>
+                                <small>Online</small>
+                            </div>
+                            <div class="chat-messages" id="chatMessages">
+                                <div class="message message-bot">
+                                    <div class="message-bubble">
+                                        
+                                        Hello! I'm your AI CFO Assistant. Upload a financial report to get started, or ask me any questions about financial analysis.
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="chat-input-section">
+                                <div class="d-flex gap-2">
+                                    <textarea class="form-control chat-input" id="chatInput"
+                                             placeholder="Ask about profitability, risks, cash flow, predictions..."
+                                             rows="1"></textarea>
+                                    <button class="send-button" id="sendButton" type="button">
+                                        <i class="fas fa-paper-plane"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Reports Tab -->
+                    <div class="tab-pane fade" id="reports" role="tabpanel">
+                        <h4 class="text-primary mb-4"><i class="fas fa-file-alt"></i> Generated Reports & Analysis</h4>
+                        <div class="d-flex justify-content-end mb-3">
+                            <select class="form-select w-auto me-2" id="reportSelector">
+                                <!-- Options will be dynamically populated -->
+                            </select>
+                            <button class="btn btn-outline-danger" id="deleteCurrentReportBtn" disabled>
+                                <i class="fas fa-trash"></i> Delete Selected
+                            </button>
+                        </div>
+                        
+                        <!-- Report Summary -->
+                        <div class="chart-container">
+                            <h5>Executive Summary</h5>
+                            <div id="reportSummary">
+                                <p class="text-muted">Select a report to view its executive summary here.</p>
+                            </div>
+                        </div>
+                        <!-- Comparison Table -->
+                        <div class="comparison-table" id="comparisonTable" style="display: none;">
+                            <h5 class="p-3 mb-0 bg-light text-primary">Multi-Report Comparison</h5>
+                            <div class="table-responsive">
+                                <table class="table table-striped mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>File Name</th>
+                                            <th>Company/Year</th>
+                                            <th>Revenue (₹Cr)</th>
+                                            <th>Profit (₹Cr)</th>
+                                            <th>Health Score</th>
+                                            <th>Risk Level</th>
+                                            <th>Runway (Months)</th>
+                                            <th>Upload Time</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="comparisonTableBody">
+                                        <!-- Comparison data will be dynamically inserted here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- Export Section -->
+                        <div class="export-section">
+                            <h5 class="text-center mb-3 text-primary">Export Options (for selected report)</h5>
+                            <div class="export-buttons" id="exportButtonsContainer">
+                                <button class="btn btn-export btn-export-json" id="exportJsonBtn" disabled>
+                                    <i class="fas fa-code"></i> Export JSON
+                                </button>
+                                <button class="btn btn-export btn-export-excel" id="exportExcelBtn" disabled>
+                                    <i class="fas fa-file-excel"></i> Export Excel
+                                </button>
+                               
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function() {
+            class CFOAssistant {
+                constructor() {
+                    this.selectedFiles = [];
+                    this.allReports = [];
+                    this.currentSelectedReportId = null;
+                    this.isProcessing = false;
+                    this.loadingInterval = null;
+                    this.loadingMessages = [
+                        'Initializing AI analysis...',
+                        'Extracting financial data from documents...',
+                        'Cleaning and sanitizing raw data...',
+                        'Performing in-depth financial analysis...',
+                        'Calculating Key Performance Indicators (KPIs)...',
+                        'Assessing financial risks and opportunities...',
+                        'Generating future trend predictions...',
+                        'Formulating strategic recommendations...',
+                        'Preparing comprehensive reports and visualizations...'
+                    ];
+                    this.currentReportIdForChat = null; // Track which report is currently in chat
+                    this.init();
+                }
+
+                init() {
+                    this.setupEventListeners();
+                    this.setupDragDrop();
+                    this.autoResizeTextarea();
+                    this.checkLoginStatus();
+                    this.loadReportsFromSession();
+                }
+
+                setupEventListeners() {
+                    $('#fileInput').on('change', (e) => this.handleFileSelect(e));
+                    $('#analyzeBtn').on('click', () => this.analyzeFiles());
+                    $('#demoBtn').on('click', () => this.runDemo());
+                    $('#clearBtn').on('click', () => this.clearAll());
+                    $('#sendButton').on('click', () => this.sendMessage());
+                    $('#chatInput').on('keypress', (e) => {
+                        if (e.which === 13 && !e.shiftKey) {
+                            e.preventDefault();
+                            this.sendMessage();
+                        }
+                    });
+                    // CORRECTED: Fixed typo in data-bs-target
+                    $('#resultsTabs button').on('shown.bs.tab', (e) => {
+                        this.renderCurrentTabContent($(e.target).data('bs-target'));
+                    });
+                    $('#reportSelector').on('change', (e) => {
+                        this.currentSelectedReportId = $(e.target).val();
+                        this.renderCurrentTabContent($('.tab-pane.active').attr('id'));
+                        this.updateExportButtonsState();
+                        this.updateDeleteButtonState();
+                    });
+                    $('#deleteCurrentReportBtn').on('click', () => this.deleteReport(this.currentSelectedReportId));
+                    $('#exportJsonBtn').on('click', () => this.exportReport('json'));
+                    $('#exportExcelBtn').on('click', () => this.exportReport('excel'));
+                    $('#exportPdfBtn').on('click', () => this.exportReport('pdf'));
+                }
+
+                setupDragDrop() {
+                    const dropZone = $('#dropZone');
+                    dropZone.on('click', (e) => {
+                        if (e.target === dropZone[0] || $(e.target).hasClass('drop-zone-content') || $(e.target).closest('.drop-zone-content').length) {
+                            $('#fileInput').click();
+                        }
+                    });
+                    dropZone.on('dragover dragenter', (e) => {
+                        e.preventDefault();
+                        dropZone.addClass('dragover');
+                    });
+                    dropZone.on('dragleave dragend', (e) => {
+                        e.preventDefault();
+                        dropZone.removeClass('dragover');
+                    });
+                    dropZone.on('drop', (e) => {
+                        e.preventDefault();
+                        dropZone.removeClass('dragover');
+                        const files = e.originalEvent.dataTransfer.files;
+                        this.processFiles(files);
+                    });
+                }
+
+                autoResizeTextarea() {
+                    $('#chatInput').on('input', function() {
+                        this.style.height = 'auto';
+                        this.style.height = (this.scrollHeight) + 'px';
+                    });
+                }
+
+                async checkLoginStatus() {
+                    try {
+                        const response = await fetch('/user_info');
+                        const data = await response.json();
+                        if (data.logged_in) {
+                            $('#userInfo').html(`<i class="fas fa-user-circle"></i> ${data.username} <span class="badge bg-secondary ms-2">${data.company_name || 'N/A'}</span>`);
+                            $('#loginSignupNav').hide();
+                            $('#logoutNav').show();
+                        } else {
+                            $('#userInfo').html('<i class="fas fa-user-circle"></i> Guest');
+                            $('#loginSignupNav').show();
+                            $('#logoutNav').hide();
+                        }
+                    } catch (error) {
+                        console.error("Error checking login status:", error);
+                        $('#userInfo').html('<i class="fas fa-user-circle"></i> Guest');
+                        $('#loginSignupNav').show();
+                        $('#logoutNav').hide();
+                    }
+                }
+
+                handleFileSelect(e) {
+                    const files = e.target.files;
+                    this.processFiles(files);
+                }
+
+                processFiles(files) {
+                    const allowedTypes = ['.pdf', '.xlsx', '.xls', '.csv'];
+                    const maxSize = 500 * 1024 * 1024;
+
+                    Array.from(files).forEach(file => {
+                        const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+                        if (!allowedTypes.includes(fileExtension)) {
+                            this.showNotification('error', `File "${file.name}" is not supported. Please use PDF, Excel, or CSV files.`);
+                            return;
+                        }
+                        if (file.size > maxSize) {
+                            this.showNotification('error', `File "${file.name}" is too large. Maximum size is 500MB.`);
+                            return;
+                        }
+                        if (!this.selectedFiles.some(f => f.name === file.name && f.size === file.size)) {
+                            this.selectedFiles.push(file);
+                        }
+                    });
+                    this.updateFilePreview();
+                    $('#analyzeBtn').prop('disabled', this.selectedFiles.length === 0);
+                }
+
+                updateFilePreview() {
+                    const preview = $('#filePreview');
+                    preview.empty();
+                    if (this.selectedFiles.length === 0) {
+                        return;
+                    }
+                    const fileList = $('<div>').addClass('mt-3');
+                    this.selectedFiles.forEach((file, index) => {
+                        const fileItem = $(`
+                            <div class="file-item animate__animated animate__slideInRight">
+                                <div class="file-info">
+                                    <i class="fas ${this.getFileIcon(file.name)} file-icon"></i>
+                                    <div>
+                                        <strong>${file.name}</strong>
+                                        <br>
+                                        <small class="text-muted">${this.formatFileSize(file.size)}</small>
+                                    </div>
+                                </div>
+                                <i class="fas fa-times remove-file" data-index="${index}"></i>
+                            </div>
+                        `);
+                        fileItem.find('.remove-file').on('click', () => this.removeFile(index));
+                        fileList.append(fileItem);
+                    });
+                    preview.append(fileList);
+                }
+
+                getFileIcon(filename) {
+                    const extension = filename.split('.').pop().toLowerCase();
+                    const icons = {
+                        'pdf': 'fa-file-pdf text-danger',
+                        'xlsx': 'fa-file-excel text-success',
+                        'xls': 'fa-file-excel text-success',
+                        'csv': 'fa-file-csv text-info'
+                    };
+                    return icons[extension] || 'fa-file';
+                }
+
+                formatFileSize(bytes) {
+                    if (bytes === 0) return '0 Bytes';
+                    const k = 1024;
+                    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                    const i = Math.floor(Math.log(bytes) / Math.log(k));
+                    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+                }
+
+                removeFile(index) {
+                    this.selectedFiles.splice(index, 1);
+                    this.updateFilePreview();
+                    $('#analyzeBtn').prop('disabled', this.selectedFiles.length === 0);
+                }
+
+                async analyzeFiles() {
+                    if (this.selectedFiles.length === 0 || this.isProcessing) {
+                        return;
+                    }
+                    this.isProcessing = true;
+                    this.showLoading();
+
+                    try {
+                        const formData = new FormData();
+                        this.selectedFiles.forEach(file => {
+                            formData.append('files', file);
+                        });
+
+                        const response = await fetch('/upload', {
+                            method: 'POST',
+                            body: formData
+                        });
+                        const data = await response.json();
+
+                        if (data.success) {
+                            this.allReports.push(...data.results);
+                            this.updateReportSelector();
+                            // Select the first successfully processed report from the new results
+                            const firstSuccessfulReport = data.results.find(r => r.status === 'processed');
+                            if (firstSuccessfulReport) {
+                                this.currentSelectedReportId = firstSuccessfulReport.id;
+                            } else if (this.allReports.length > 0) {
+                                // Fallback to the latest existing report if no new successful ones
+                                this.currentSelectedReportId = this.allReports[0].id;
+                            } else {
+                                this.currentSelectedReportId = null; // No reports at all
+                            }
+                            
+                            this.showResults();
+                            new bootstrap.Tab(document.querySelector('#resultsTabs button[data-bs-target="#dashboard"]')).show();
+                            this.selectedFiles = [];
+                            this.updateFilePreview();
+                            $('#analyzeBtn').prop('disabled', true);
+                            this.showNotification('success', `Successfully analyzed ${data.results.length} file(s)`);
+                        } else {
+                            throw new Error(data.error || 'Analysis failed');
+                        }
+                    } catch (error) {
+                        this.showNotification('error', error.message);
+                    } finally {
+                        this.hideLoading();
+                        this.isProcessing = false;
+                    }
+                }
+
+                async runDemo() {
+                    if (this.isProcessing) return;
+                    this.isProcessing = true;
+                    this.showLoading('Generating demo report...');
+
+                    try {
+                        const response = await fetch('/demo');
+                        const data = await response.json();
+
+                        if (data.success) {
+                            const existingDemoIndex = this.allReports.findIndex(r => r.id === data.result.id);
+                            if (existingDemoIndex !== -1) {
+                                this.allReports[existingDemoIndex] = data.result;
+                            } else {
+                                this.allReports.push(data.result);
+                            }
+                            this.updateReportSelector();
+                            this.currentSelectedReportId = data.result.id;
+                            this.showResults();
+                            new bootstrap.Tab(document.querySelector('#resultsTabs button[data-bs-target="#dashboard"]')).show();
+                            this.showNotification('success', 'Demo report generated successfully');
+                        } else {
+                            throw new Error(data.error || 'Demo generation failed');
+                        }
+                    } catch (error) {
+                        this.showNotification('error', error.message);
+                    } finally {
+                        this.hideLoading();
+                        this.isProcessing = false;
+                    }
+                }
+
+                showLoading() {
+                    let messageIndex = 0;
+                    $('#loadingStatus').text(this.loadingMessages[messageIndex]);
+                    $('#loadingOverlay').fadeIn();
+
+                    this.loadingInterval = setInterval(() => {
+                        if (messageIndex < this.loadingMessages.length - 1) {
+                            messageIndex++;
+                            $('#loadingStatus').text(this.loadingMessages[messageIndex]);
+                        } else {
+                            messageIndex = 0;
+                            $('#loadingStatus').text(this.loadingMessages[messageIndex]);
+                        }
+                    }, 3000);
+                }
+
+                hideLoading() {
+                    if (this.loadingInterval) {
+                        clearInterval(this.loadingInterval);
+                        this.loadingInterval = null;
+                    }
+                    $('#loadingOverlay').fadeOut();
+                }
+
+                showResults() {
+                    $('#resultsSection').fadeIn();
+                    if (this.currentSelectedReportId) {
+                        $('#reportSelector').val(this.currentSelectedReportId);
+                    } else if (this.allReports.length > 0) {
+                        this.currentSelectedReportId = this.allReports[0].id;
+                        $('#reportSelector').val(this.currentSelectedReportId);
+                    }
+                    const activeTabId = $('#resultsTabs button.active').data('bs-target');
+                    this.renderCurrentTabContent(activeTabId);
+                    this.updateComparisonTable();
+                    this.updateExportButtonsState();
+                    this.updateDeleteButtonState();
+                }
+
+                async loadReportsFromSession() {
+                    try {
+                        const response = await fetch('/get_reports');
+                        const data = await response.json();
+                        if (data.success && data.reports.length > 0) {
+                            this.allReports = data.reports;
+                            this.updateReportSelector();
+                            const latestProcessedReport = this.allReports.find(r => r.status === 'processed');
+                            if (latestProcessedReport) {
+                                this.currentSelectedReportId = latestProcessedReport.id;
+                            } else {
+                                this.currentSelectedReportId = this.allReports[0].id; // Fallback to any report
+                            }
+                            
+                            this.showResults();
+                        } else {
+                            if (!data.success) {
+                                console.error("Error loading reports from session:", data.error);
+                                this.showNotification('error', 'Failed to load previous reports.');
+                            }
+                            $('#resultsSection').hide();
+                        }
+                    } catch (error) {
+                        console.error("Error loading reports from session (network/server issue):", error);
+                        $('#resultsSection').hide();
+                    }
+                }
+
+                updateReportSelector() {
+                    const selector = $('#reportSelector');
+                    selector.empty();
+                    if (this.allReports.length === 0) {
+                        selector.append('<option value="">No reports available</option>');
+                        selector.prop('disabled', true);
+                        this.currentSelectedReportId = null;
+                        return;
+                    }
+
+                    this.allReports.forEach(report => {
+                        const statusIndicator = report.status === 'failed' ? ' (Failed)' : '';
+                        const optionText = `${report.file_name} (${report.financial_year || 'N/A'}) - ${report.company_name || 'N/A'}${statusIndicator}`;
+                        selector.append(`<option value="${report.id}">${optionText}</option>`);
+                    });
+                    selector.prop('disabled', false);
+
+                    if (this.currentSelectedReportId) {
+                        selector.val(this.currentSelectedReportId);
+                    } else if (this.allReports.length > 0) {
+                        this.currentSelectedReportId = this.allReports[0].id;
+                        selector.val(this.currentSelectedReportId);
+                    }
+                }
+
+                getCurrentReport() {
+                    if (!this.currentSelectedReportId) {
+                        return null;
+                    }
+                    const report = this.allReports.find(r => r.id === this.currentSelectedReportId);
+                    return report;
+                }
+
+                renderCurrentTabContent(tabId) {
+                    const report = this.getCurrentReport();
+                    
+                    this.clearAllChartDivs();
+                    $('#reportSummary').empty();
+
+                    if (!report) {
+                        $('#reportSummary').html('<p class="text-muted">No report selected or available. Please upload a file or try the demo.</p>');
+                        return;
+                    }
+
+                    if (report.status === 'failed') {
+                        $('#reportSummary').html(`<p class="text-danger">Error: Failed to process report "${report.file_name}". ${report.error || 'Unknown error.'}</p>`);
+                        $('#chatMessages').html(`
+                            <div class="message message-bot">
+                                <div class="message-bubble">
+                                    Cannot chat about a failed report. Please select a successfully processed report.
+                                </div>
+                            </div>
+                        `);
+                        return;
+                    }
+
+                    switch (tabId) {
+                        case '#dashboard':
+                            this.renderDashboard(report);
+                            break;
+                        case '#charts':
+                            this.renderCharts(report);
+                            break;
+                        case '#risks':
+                            this.renderRiskAnalysis(report);
+                            break;
+                        case '#predictions':
+                            this.renderPredictions(report);
+                            break;
+                        case '#chat':
+                            if (this.currentReportIdForChat !== report.id) {
+                                $('#chatMessages').html(`
+                                    <div class="message message-bot">
+                                        <div class="message-bubble">
+                                            Hello! I'm your AI CFO Assistant. I'm currently analyzing "${report.file_name}". Ask me anything about its financial performance!
+                                        </div>
+                                    </div>
+                                `);
+                                this.currentReportIdForChat = report.id;
+                            }
+                            break;
+                        case '#reports':
+                            this.renderReports(report);
+                            break;
+                    }
+                }
+
+                clearAllChartDivs() {
+                    $('#kpiGrid').empty();
+                    // Explicitly purge and empty each Plotly chart container
+                    Plotly.purge('financialOverviewChart'); $('#financialOverviewChart').empty();
+                    Plotly.purge('healthScoreGauge'); $('#healthScoreGauge').empty();
+                    Plotly.purge('kpiComparisonChart'); $('#kpiComparisonChart').empty();
+                    Plotly.purge('revenueScenariosChart'); $('#revenueScenariosChart').empty();
+                    Plotly.purge('cashFlowAnalysisChart'); $('#cashFlowAnalysisChart').empty();
+                    Plotly.purge('profitabilityTrendChart'); $('#profitabilityTrendChart').empty();
+                    $('#companyComparisonContainer').hide();
+                    Plotly.purge('companyComparisonChart'); $('#companyComparisonChart').empty();
+                    $('#riskAlerts').empty();
+                    Plotly.purge('riskDistributionChart'); $('#riskDistributionChart').empty();
+                    Plotly.purge('revenueForecastChart'); $('#revenueForecastChart').empty();
+                    Plotly.purge('cashFlowProjectionChart'); $('#cashFlowProjectionChart').empty();
+                    Plotly.purge('profitPredictionChart'); $('#profitPredictionChart').empty();
+                }
+
+                renderDashboard(report) {
+                    const metrics = report.metrics;
+                    const analysis = report.analysis;
+
+                    const kpiGrid = $('#kpiGrid');
+                    kpiGrid.empty();
+
+                    const kpis = [
+                        { icon: 'fa-rupee-sign', value: `₹${(metrics.revenue || 0).toFixed(2)}Cr`, label: 'Revenue', tooltip: 'Total revenue generated' },
+                        { icon: 'fa-chart-line', value: `${(metrics.profitability || 0).toFixed(1)}%`, label: 'Profitability', tooltip: 'Net profit margin percentage' },
+                        { icon: 'fa-coins', value: `₹${(metrics.cash || 0).toFixed(2)}Cr`, label: 'Cash Reserves', tooltip: 'Available cash and equivalents' },
+                        { icon: 'fa-clock', value: `${(metrics.runway_months || 0).toFixed(1)}M`, label: 'Runway', tooltip: 'Months of cash remaining at current burn rate' },
+                        { icon: 'fa-fire', value: `₹${(metrics.burn_rate || 0).toFixed(2)}Cr`, label: 'Monthly Burn', tooltip: 'Monthly cash expenditure' },
+                        { icon: 'fa-heart', value: `${(analysis.health_score || 0).toFixed(0)}/100`, label: 'Health Score', tooltip: 'Overall financial health indicator' }
+                    ];
+
+                    kpis.forEach(kpi => {
+                        const kpiCard = $(`
+                            <div class="kpi-card tooltip-custom animate__animated animate__fadeInUp" data-tooltip="${kpi.tooltip}">
+                                <i class="fas ${kpi.icon} kpi-icon"></i>
+                                <div class="kpi-value">${kpi.value}</div>
+                                <div class="kpi-label">${kpi.label}</div>
+                            </div>
+                        `);
+                        kpiGrid.append(kpiCard);
+                    });
+
+                    this.renderFinancialOverviewChart(report.metrics);
+                    this.renderHealthScoreGauge(analysis.health_score || 0, report.metrics.company_name);
+                }
+
+                renderFinancialOverviewChart(metrics) {
+                    const data = [{
+                        x: ['Revenue', 'Expenses', 'Profit', 'Assets', 'Liabilities', 'Cash'],
+                        y: [metrics.revenue || 0, metrics.expenses || 0, metrics.profit || 0,
+                           metrics.assets || 0, metrics.liabilities || 0, metrics.cash || 0],
+                        type: 'bar',
+                        marker: {
+                            color: ['#2ecc71', '#e74c3c', '#3498db', '#f39c12', '#9b59b6', '#1abc9c']
+                        }
+                    }];
+                    const layout = {
+                        title: `${metrics.company_name || 'Company'} - Financial Overview (in Crores)`,
+                        xaxis: { title: 'Categories' },
+                        yaxis: { title: 'Amount (₹ Crores)' },
+                        margin: { t: 50, l: 50, r: 50, b: 50 },
+                        height: 450
+                    };
+                    Plotly.newPlot('financialOverviewChart', data, layout, { responsive: true });
+                }
+
+                renderHealthScoreGauge(score, companyName) {
+                    const data = [{
+                        type: "indicator",
+                        mode: "gauge+number+delta",
+                        value: score,
+                        domain: { x: [0, 1], y: [0, 1] },
+                        title: { text: `${companyName || 'Company'} - Financial Health Score` },
+                        delta: { reference: 80, increasing: { color: "#2ecc71" }, decreasing: { color: "#e74c3c" } },
+                        gauge: {
+                            axis: { range: [null, 100], tickwidth: 1, tickcolor: "darkblue" },
+                            bar: { color: score >= 80 ? "#2ecc71" : score >= 60 ? "#f39c12" : "#e74c3c" },
+                            steps: [
+                                { range: [0, 50], color: "#e74c3c" },
+                                { range: [50, 70], color: "#f39c12" },
+                                { range: [70, 85], color: "#3498db" },
+                                { range: [85, 100], color: "#2ecc71" }
+                            ],
+                            threshold: {
+                                line: { color: "red", width: 4 },
+                                thickness: 0.75,
+                                value: 90
+                            }
+                        }
+                    }];
+                    const layout = {
+                        width: 300,
+                        height: 280,
+                        margin: { t: 0, l: 0, r: 0, b: 0 }
+                    };
+                    Plotly.newPlot('healthScoreGauge', data, layout, { responsive: true });
+                }
+
+                async renderCharts(report) {
+                    try {
+                        const response = await fetch('/generate_charts', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ report_id: report.id })
+                        });
+                        const data = await response.json();
+
+                        if (data.success) {
+                            for (const chartKey in data.charts) {
+                                // Dynamically map backend chart keys to frontend HTML IDs
+                                let chartHtmlId;
+                                if (chartKey === 'financial_overview') chartHtmlId = 'financialOverviewChart';
+                                else if (chartKey === 'kpi_comparison') chartHtmlId = 'kpiComparisonChart';
+                                else if (chartKey === 'health_gauge') chartHtmlId = 'healthScoreGauge';
+                                else if (chartKey === 'revenue_scenarios') chartHtmlId = 'revenueScenariosChart';
+                                else if (chartKey === 'cash_flow_projection') chartHtmlId = 'cashFlowAnalysisChart';
+                                else if (chartKey === 'profitability_trend') chartHtmlId = 'profitabilityTrendChart';
+                                else if (chartKey === 'risk_distribution') chartHtmlId = 'riskDistributionChart';
+                                else if (chartKey === 'company_comparison') chartHtmlId = 'companyComparisonChart';
+                                else continue;
+
+
+                                const chartContainer = $('#' + chartHtmlId);
+                                if (chartContainer.length > 0 && data.charts[chartKey]) {
+                                    try {
+                                        const plotData = JSON.parse(data.charts[chartKey]);
+                                        if (plotData && plotData.data && plotData.layout) {
+                                            Plotly.newPlot(chartHtmlId, plotData.data, plotData.layout);
+                                        } else {
+                                            console.warn(`Invalid Plotly JSON for ${chartKey}:`, plotData);
+                                            chartContainer.html(`<p class="text-warning text-center">Chart data for ${chartKey} is incomplete.</p>`);
+                                        }
+                                    } catch (e) {
+                                        console.error(`Error parsing or plotting ${chartKey}:`, e, data.charts[chartKey]);
+                                        chartContainer.html(`<p class="text-danger text-center">Failed to render ${chartKey} chart.</p>`);
+                                    }
+                                }
+                            }
+                            
+                            if (data.charts.company_comparison) {
+                                try {
+                                    const comparisonPlotData = JSON.parse(data.charts.company_comparison);
+                                    if (comparisonPlotData && comparisonPlotData.data && comparisonPlotData.data.length > 0) {
+                                        $('#companyComparisonContainer').show();
+                                        Plotly.newPlot('companyComparisonChart', comparisonPlotData.data, comparisonPlotData.layout);
+                                    } else {
+                                        $('#companyComparisonContainer').hide();
+                                    }
+                                } catch (e) {
+                                    console.error("Error parsing company_comparison chart data:", e);
+                                    $('#companyComparisonContainer').hide();
+                                }
+                            } else {
+                                $('#companyComparisonContainer').hide();
+                            }
+
+                        } else {
+                            console.error('Chart generation failed (backend error):', data.error);
+                            this.showNotification('error', data.error || 'Failed to generate charts');
+                        }
+                    } catch (error) {
+                        console.error('Chart generation failed (frontend or network error):', error);
+                        this.showNotification('error', 'Failed to generate advanced charts. Check console for details.');
+                    }
+                }
+
+
+                renderRiskAnalysis(report) {
+                    const risks = report.analysis.risks;
+                    const riskAlerts = $('#riskAlerts');
+                    riskAlerts.empty();
+
+                    if (risks.length === 0) {
+                        riskAlerts.append(`
+                            <div class="risk-alert risk-low">
+                                <h5><i class="fas fa-check-circle"></i> No Critical Risks Detected</h5>
+                                <p>Your financial position appears stable with no immediate concerns identified.</p>
+                            </div>
+                        `);
+                    } else {
+                        risks.forEach(risk => {
+                            const alertClass = `risk-${risk.level}`;
+                            const iconMap = {
+                                'critical': 'fa-exclamation-triangle',
+                                'high': 'fa-exclamation-circle',
+                                'medium': 'fa-info-circle',
+                                'low': 'fa-check-circle'
+                            };
+                            const affectedKPIs = risk.kpi_affected ? `<strong>KPIs Affected:</strong> ${risk.kpi_affected.join(', ')}` : '';
+                            const alert = $(`
+                                <div class="risk-alert ${alertClass} animate__animated animate__fadeInLeft">
+                                    <h5>
+                                        <i class="fas ${iconMap[risk.level]}"></i>
+                                        ${risk.message}
+                                    </h5>
+                                    <p><strong>Impact:</strong> ${risk.impact}</p>
+                                    <p><strong>Recommendation:</strong> ${risk.recommendation}</p>
+                                    <p><strong>Timeline:</strong> ${risk.timeline}</p>
+                                    <p>${affectedKPIs}</p>
+                                </div>
+                            `);
+                            riskAlerts.append(alert);
+                        });
+                    }
+                    this.renderRiskDistributionChart(risks, report.metrics.company_name);
+                }
+
+                renderRiskDistributionChart(risks, companyName) {
+                    const riskCounts = { 'Critical': 0, 'High': 0, 'Medium': 0, 'Low': 0 };
+                    risks.forEach(risk => {
+                        const level = risk.level.charAt(0).toUpperCase() + risk.level.slice(1);
+                        if (riskCounts.hasOwnProperty(level)) {
+                            riskCounts[level]++;
+                        }
+                    });
+
+                    const data = [{
+                        values: Object.values(riskCounts),
+                        labels: Object.keys(riskCounts),
+                        type: 'pie',
+                        marker: {
+                            colors: ['#e74c3c', '#f39c12', '#3498db', '#2ecc71']
+                        },
+                        hoverinfo: 'label+percent',
+                        textinfo: 'percent',
+                        hole: .4
+                    }];
+                    const layout = {
+                        title: `${companyName || 'Company'} - Risk Distribution by Severity`,
+                        height: 450,
+                        margin: { t: 50, b: 50, l: 0, r: 0 }
+                    };
+                    Plotly.newPlot('riskDistributionChart', data, layout, { responsive: true });
+                }
+
+                renderPredictions(report) {
+                    const predictions = report.predictions;
+                    const companyName = report.metrics.company_name;
+
+                    // Clear existing prediction charts
+                    $('#revenueForecastChart').empty();
+                    $('#cashFlowProjectionChart').empty();
+                    $('#profitPredictionChart').empty();
+
+                    this.renderPredictionChart('revenueForecastChart', predictions.revenue_realistic, 'Revenue Forecast (Next 5 Years)', 'Revenue (₹ Crores)', companyName, '#3498db');
+                    this.renderPredictionChart('cashFlowProjectionChart', predictions.cash_realistic, 'Cash Flow Projection (Next 5 Years)', 'Cash Balance (₹ Crores)', companyName, '#2ecc71');
+                    this.renderPredictionChart('profitPredictionChart', predictions.profit_realistic, 'Profit Prediction Analysis (Next 5 Years)', 'Profit (₹ Crores)', companyName, '#e67e22');
+                }
+
+                renderPredictionChart(elementId, predictionData, title, yAxisTitle, companyName, color) {
+                    if (!predictionData || !predictionData.values || predictionData.values.length === 0) {
+                        $(`#${elementId}`).html(`<p class="text-muted text-center">No prediction data available for ${title}.</p>`);
+                        return;
+                    }
+                    const months = Array.from({ length: predictionData.values.length }, (_, i) => `Month ${i + 1}`);
+                    const data = [{
+                        x: months,
+                        y: predictionData.values,
+                        type: 'scatter',
+                        mode: 'lines+markers',
+                        name: title,
+                        line: { color: color, width: 3 },
+                        marker: { size: 6, color: color }
+                    }];
+                    const layout = {
+                        title: `${companyName || 'Company'} - ${title}`,
+                        xaxis: { title: 'Time Period' },
+                        yaxis: { title: yAxisTitle },
+                        height: 450,
+                        margin: { t: 50, l: 60, r: 50, b: 50 }
+                    };
+                    Plotly.newPlot(elementId, data, layout, { responsive: true });
+                }
+
+                renderReports(report) {
+                    const reportSummary = $('#reportSummary');
+                    reportSummary.empty(); // Clear previous content
+
+                    if (report && report.report) {
+                        const formattedReport = report.report.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+                        reportSummary.html(`
+                            <div class="animate__animated animate__fadeInUp">
+                                <div class="mb-4">
+                                    <h6><i class="fas fa-file-alt"></i> ${report.file_name}</h6>
+                                    <small class="text-muted">Processed in ${report.processing_time.toFixed(0)}ms | Confidence: ${report.confidence_score}%</small>
+                                </div>
+                                <div class="report-content">
+                                    ${formattedReport}
+                                </div>
+                            </div>
+                        `);
+                    } else if (report && report.status === 'failed') {
+                        reportSummary.html(`<p class="text-danger">Error: Failed to process report "${report.file_name}". ${report.error || 'Unknown error.'}</p>`);
+                    }
+                    else {
+                        reportSummary.html('<p class="text-muted">No executive summary available for this report.</p>');
+                    }
+                }
+
+                updateComparisonTable() {
+                    const tableBody = $('#comparisonTableBody');
+                    tableBody.empty();
+
+                    const groupedReports = {};
+                    this.allReports.forEach(report => {
+                        if (report.status === 'processed') {
+                            const groupKey = report.company_group || report.company_name || 'Uncategorized';
+                            if (!groupedReports[groupKey]) {
+                                groupedReports[groupKey] = [];
+                            }
+                            groupedReports[groupKey].push(report);
+                        }
+                    });
+
+                    let hasComparison = false;
+                    for (const groupKey in groupedReports) {
+                        const reportsInGroup = groupedReports[groupKey];
+                        if (reportsInGroup.length > 1) {
+                            hasComparison = true;
+                            reportsInGroup.sort((a, b) => {
+                                const yearA = parseInt((a.financial_year || '0').split('-')[0]);
+                                const yearB = parseInt((b.financial_year || '0').split('-')[0]);
+                                return yearA - yearB;
+                            });
+
+                            reportsInGroup.forEach((report, index) => {
+                                const row = $(`
+                                    <tr class="animate__animated animate__fadeInUp" style="animation-delay: ${index * 0.1}s">
+                                        <td><strong>${report.file_name}</strong></td>
+                                        <td>${report.company_name || 'N/A'} / ${report.financial_year || 'N/A'}</td>
+                                        <td>₹${(report.revenue || 0).toFixed(2)}</td>
+                                        <td>₹${(report.profit || 0).toFixed(2)}</td>
+                                        <td>
+                                            <span class="badge ${this.getHealthBadgeClass(report.health_score || 0)}">
+                                                ${(report.health_score || 0).toFixed(0)}/100
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge ${this.getRiskBadgeClass(report.risk_level)}">
+                                                ${(report.risk_level || 'unknown').toUpperCase()}
+                                            </span>
+                                        </td>
+                                        <td>${(report.runway_months || 0).toFixed(1)}M</td>
+                                        <td>${new Date(report.upload_time).toLocaleString()}</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary me-1" onclick="cfoAssistant.viewReport('${report.id}')" title="View Report">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger" onclick="cfoAssistant.deleteReport('${report.id}')" title="Delete Report">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `);
+                                tableBody.append(row);
+                            });
+                            tableBody.append(`<tr><td colspan="9"><hr class="my-2"></td></tr>`);
+                        }
+                    }
+                    
+                    if (hasComparison) {
+                        $('#comparisonTable').show();
+                    } else {
+                        $('#comparisonTable').hide();
+                    }
+                }
+
+                getHealthBadgeClass(score) {
+                    if (score >= 80) return 'bg-success';
+                    if (score >= 60) return 'bg-warning text-dark';
+                    return 'bg-danger';
+                }
+
+                getRiskBadgeClass(level) {
+                    const classes = {
+                        'low': 'bg-success',
+                        'medium': 'bg-warning text-dark',
+                        'high': 'bg-danger',
+                        'critical': 'bg-dark'
+                    };
+                    return classes[level] || 'bg-secondary';
+                }
+
+                async sendMessage() {
+                    const input = $('#chatInput');
+                    const message = input.val().trim();
+                    if (!message || this.isProcessing || !this.currentSelectedReportId) {
+                        if (!this.currentSelectedReportId) {
+                            this.showNotification('warning', 'Please select a report to chat about.');
+                        }
+                        return;
+                    }
+
+                    this.isProcessing = true;
+                    this.addChatMessage('user', message);
+                    input.val('').css('height', 'auto');
+
+                    const typingId = this.addTypingIndicator();
+
+                    try {
+                        const response = await fetch('/chat', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ query: message, report_id: this.currentSelectedReportId })
+                        });
+                        const data = await response.json();
+
+                        this.removeTypingIndicator(typingId);
+
+                        if (data.success) {
+                            this.addChatMessage('bot', data.response);
+                        } else {
+                            throw new Error(data.error || 'Failed to get response');
+                        }
+                    } catch (error) {
+                        this.removeTypingIndicator(typingId);
+                        this.addChatMessage('bot', 'Sorry, I encountered an error processing your request. Please try again.');
+                        this.showNotification('error', error.message);
+                    } finally {
+                        this.isProcessing = false;
+                    }
+                }
+
+                addChatMessage(role, content) {
+                    const messagesContainer = $('#chatMessages');
+                    const messageClass = role === 'user' ? 'message-user' : 'message-bot';
+                    const message = $(`
+                        <div class="message ${messageClass} animate__animated animate__fadeInUp">
+                            <div class="message-bubble">
+                                ${content}
+                            </div>
+                            <small class="text-muted d-block mt-1">
+                                ${new Date().toLocaleTimeString()}
+                            </small>
+                        </div>
+                    `);
+                    messagesContainer.append(message);
+                    messagesContainer.scrollTop(messagesContainer[0].scrollHeight);
+                }
+
+                addTypingIndicator() {
+                    const messagesContainer = $('#chatMessages');
+                    const typingId = 'typing_' + Date.now();
+                    const typing = $(`
+                        <div class="message message-bot animate__animated animate__fadeInUp" id="${typingId}">
+                            <div class="message-bubble">
+                                <i class="fas fa-circle-notch fa-spin"></i> AI is thinking...
+                            </div>
+                        </div>
+                    `);
+                    messagesContainer.append(typing);
+                    messagesContainer.scrollTop(messagesContainer[0].scrollHeight);
+                    return typingId;
+                }
+
+                updateExportButtonsState() {
+                    const isDisabled = !this.currentSelectedReportId || (this.getCurrentReport()?.status === 'failed');
+                    $('#exportJsonBtn, #exportExcelBtn, #exportPdfBtn').prop('disabled', isDisabled);
+                    $('.btn-download-exported').remove();
+                }
+
+                updateDeleteButtonState() {
+                    $('#deleteCurrentReportBtn').prop('disabled', !this.currentSelectedReportId);
+                }
+
+                async exportReport(format) {
+                    if (!this.currentSelectedReportId || this.isProcessing) {
+                        this.showNotification('warning', 'No report selected to export.');
+                        return;
+                    }
+                    if (this.getCurrentReport()?.status === 'failed') {
+                        this.showNotification('error', 'Cannot export a failed report.');
+                        return;
+                    }
+                    this.isProcessing = true;
+                    this.showLoading(`Generating ${format.toUpperCase()} report...`);
+
+                    try {
+                        const response = await fetch('/export_report', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                report_id: this.currentSelectedReportId,
+                                format: format
+                            })
+                        });
+                        const data = await response.json();
+
+                        if (data.success) {
+                            if (format === 'json') {
+                                this.downloadJSON(data.data, data.filename);
+                                this.showNotification('success', 'JSON report downloaded successfully');
+                            } else if (format === 'excel' || format === 'pdf') {
+                                this.showNotification('success', `${format.toUpperCase()} report created: ${data.filename}`);
+                                const downloadBtn = $(`
+                                    <button class="btn btn-custom btn-download-exported ms-2" onclick="window.open('/download_report/${data.filename}', '_blank')">
+                                        <i class="fas fa-download"></i> Download ${format.toUpperCase()}
+                                    </button>
+                                `);
+                                $('#exportButtonsContainer').append(downloadBtn);
+                                setTimeout(() => downloadBtn.remove(), 30000);
+                            }
+                        } else {
+                            throw new Error(data.error || 'Export failed');
+                        }
+                    } catch (error) {
+                        this.showNotification('error', `Export failed: ${error.message}`);
+                    } finally {
+                        this.hideLoading();
+                        this.isProcessing = false;
+                    }
+                }
+
+                downloadJSON(data, filename) {
+                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                }
+
+                viewReport(reportId) {
+                    this.currentSelectedReportId = reportId;
+                    $('#reportSelector').val(reportId);
+                    $('button[data-bs-target="#reports"]').tab('show');
+                    this.renderCurrentTabContent('#reports');
+                    this.showNotification('info', `Viewing report: ${this.getCurrentReport()?.file_name || 'N/A'}`);
+                    this.updateExportButtonsState();
+                    this.updateDeleteButtonState();
+                }
+
+                async deleteReport(reportIdToDelete) {
+                    if (!reportIdToDelete) {
+                        this.showNotification('warning', 'No report selected for deletion.');
+                        return;
+                    }
+
+                    if (confirm('Are you sure you want to delete this report? This action cannot be undone.')) {
+                        const initialLength = this.allReports.length;
+                        this.allReports = this.allReports.filter(report => report.id !== reportIdToDelete);
+
+                        if (this.allReports.length < initialLength) {
+                            this.updateReportSelector();
+                            this.updateComparisonTable();
+
+                            if (this.allReports.length === 0) {
+                                $('#resultsSection').fadeOut();
+                                this.currentSelectedReportId = null;
+                                $('#chatMessages').html(`
+                                    <div class="message message-bot">
+                                        <div class="message-bubble">
+                                            Hello! I'm your AI CFO Assistant. Upload a financial report to get started, or ask me any questions about financial analysis.
+                                        </div>
+                                    </div>
+                                `);
+                            } else {
+                                if (this.currentSelectedReportId === reportIdToDelete) {
+                                    this.currentSelectedReportId = this.allReports[0].id;
+                                    $('#reportSelector').val(this.currentSelectedReportId);
+                                }
+                                this.renderCurrentTabContent($('.tab-pane.active').attr('id'));
+                            }
+                            this.showNotification('success', 'Report deleted successfully.');
+                            this.updateExportButtonsState();
+                            this.updateDeleteButtonState();
+                        } else {
+                            this.showNotification('error', 'Failed to find report for deletion.');
+                        }
+                    }
+                }
+
+                async clearAll() {
+                    if (confirm('This will clear all uploaded files and processed reports from your session. Are you sure?')) {
+                        this.selectedFiles = [];
+                        this.allReports = [];
+                        this.currentSelectedReportId = null;
+                        this.updateFilePreview();
+                        $('#resultsSection').fadeOut();
+                        $('#chatMessages').html(`
+                            <div class="message message-bot">
+                                <div class="message-bubble">
+                                    Hello! I'm your AI CFO Assistant. Upload a financial report to get started, or ask me any questions about financial analysis.
+                                </div>
+                            </div>
+                        `);
+                        this.updateReportSelector();
+                        this.updateComparisonTable();
+                        this.updateExportButtonsState();
+                        this.updateDeleteButtonState();
+
+                        try {
+                            await fetch('/clear_session', { method: 'POST' });
+                            this.showNotification('success', 'All data cleared successfully.');
+                        } catch (error) {
+                            console.error("Error clearing server session:", error);
+                            this.showNotification('error', 'Failed to clear server session data.');
+                        }
+                    }
+                }
+
+                showNotification(type, message) {
+                    const notification = $(`
+                        <div class="notification ${type} animate__animated animate__slideInRight">
+                            <i class="fas ${this.getNotificationIcon(type)}"></i>
+                            ${message}
+                        </div>
+                    `);
+                    $('body').append(notification);
+
+                    setTimeout(() => {
+                        notification.addClass('animate__slideOutRight');
+                        setTimeout(() => notification.remove(), 300);
+                    }, 5000);
+                }
+
+                getNotificationIcon(type) {
+                    const icons = {
+                        'success': 'fa-check-circle',
+                        'error': 'fa-exclamation-circle',
+                        'warning': 'fa-exclamation-triangle',
+                        'info': 'fa-info-circle'
+                    };
+                    return icons[type] || 'fa-info-circle';
+                }
+            }
+
+            window.cfoAssistant = new CFOAssistant();
+        });
+    </script>
+</body>
+</html>

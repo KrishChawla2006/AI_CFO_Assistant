@@ -1,0 +1,861 @@
+{% extends "base.html" %}
+
+{% block title %}AI CFO Agent — Smart Finance Assistant{% endblock %}
+
+{% block styles %}
+     <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+         .text-muted { color: #a9b2bc !important; }
+        .chart-container { position: relative; height: 350px; width: 100%; }
+        .chart-container canvas { height: 100% !important; width: 100% !important; }
+        :root{ --bg-900:#071024; --bg-800:#0a1b2b; --glass: rgba(255,255,255,0.06); --accent:#22c1ff; --accent-2:#4ad29b; --muted:#94a3b8; --shadow-glow: 0 8px 30px rgba(34,193,255,0.15); }
+        html,body { height:100%; }
+        body{ margin:0; font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial; background: linear-gradient(180deg,var(--bg-900) 0%, #071a2d 100%); color:#e6eef7; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; overflow-x:hidden; transition: background 0.4s ease; }
+        .navbar.scrolled { background: rgba(5,12,22,0.95); box-shadow: 0 6px 30px rgba(2, 6, 23, 0.7); transition: all 0.4s ease-in-out; }
+        .brand { font-weight:800; color:var(--accent); letter-spacing:0.2px; transition: transform 0.3s ease, color 0.4s ease; }
+        .brand:hover { transform: scale(1.05); color: var(--accent-2); }
+        .nav-link { color: #d9e8f5 !important; transition: color 0.3s ease; }
+        .nav-link:hover { color: var(--accent) !important; }
+        .hero { position:relative; min-height:99vh; display:flex; align-items:center; justify-content:center; text-align:center; overflow:hidden; perspective:1000px; }
+        .hero video { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; filter: saturate(.9) contrast(.92) brightness(.5); transition: filter 0.6s ease; }
+        .hero:hover video { filter: saturate(1.1) contrast(1) brightness(0.6); }
+        .hero::after { content:""; position:absolute; inset:0; background: linear-gradient(180deg, rgba(148, 164, 193, 0.203), rgba(0, 0, 0, 0.592)); z-index:1; transition: background 0.5s ease; }
+        .hero-inner { position:relative; z-index:3; max-width:1100px; padding: 60px 20px; backdrop-filter: blur(0.5px); animation: fadeInUp 1.2s ease forwards; }
+        .hero .eyebrow { color:var(--muted); font-weight:600; letter-spacing:.6px; }
+        .hero h1 { font-size:clamp(2rem,4vw,3.4rem); margin-top:12px; color: #dff9ff; text-shadow: 0 6px 25px rgb(0, 0, 0); animation: animate__animated animate__fadeInDown 1s; }
+        .hero p { color: #cfeaf7; font-size:1.05rem; margin-top:14px; max-width:820px; margin-left:auto;margin-right:auto; animation: animate__animated animate__fadeIn 1.3s; text-shadow: 0 6px 25px rgb(0, 0, 0); }
+        .hero-cta { margin-top:20px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+        .btn-primary-soft{ background:linear-gradient(90deg,var(--accent),#0ad0ff); color:#041026; border-radius:999px; padding:12px 26px; font-weight:700; box-shadow:0 8px 30px rgba(34,193,255,0.12); border:none; transition: transform 0.35s ease, box-shadow 0.35s ease; }
+        .btn-primary-soft:hover{ transform: translateY(-3px) scale(1.05); box-shadow: 0 12px 40px rgba(34, 192, 255, 0.821); }
+        .btn-outline-light{ border-radius:999px; padding:12px 26px; color:#44a1db; border:1px solid rgba(255,255,255,0.06); background:#17aaf33d; transition: transform 0.35s ease, color 0.3s ease, background 0.3s ease; }
+        .btn-outline-light:hover{ background:rgba(106, 186, 218, 0.1); color: var(--accent-2); transform: translateY(-3px) scale(1.03); }
+        #particles { position:absolute; inset:0; z-index:2; pointer-events:none; opacity:.65; mix-blend-mode:screen; transition: opacity 0.5s ease; }
+        .hero:hover #particles { opacity:0.85; }
+        .features { padding:150px 20px; }
+        .feature { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:14px; padding:26px; height:100%; transition: transform .35s ease, box-shadow .35s ease, background 0.4s ease; border: 1px solid rgba(255,255,255,0.03); }
+        .feature:hover{ transform: translateY(-12px) rotateX(4deg) scale(1.02); box-shadow: 0 16px 40px rgba(2,6,23,0.6), var(--shadow-glow); border: 1px solid rgba(34,193,255,0.08); background: linear-gradient(180deg, rgba(34,193,255,0.04), rgba(74,210,155,0.02)); }
+        .feature .icon { width:68px;height:68px;border-radius:12px;display:flex;align-items:center;justify-content:center; background: linear-gradient(180deg, rgba(34,193,255,0.14), rgba(74,210,155,0.06)); color:var(--accent); font-size:28px;margin-bottom:12px; transition: transform 0.35s ease, box-shadow 0.35s ease; }
+        .feature:hover .icon { transform: rotate(15deg) scale(1.1); box-shadow: 0 8px 25px rgba(34,193,255,0.2); }
+        .feature h5{ font-weight:700; color: #e7fbff; transition: color 0.3s ease; }
+        .feature:hover h5 { color: var(--accent-2); }
+        .dashboard { padding: 85px 20px 70px; background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00)); border-top: 1px solid rgba(255,255,255,0.02); }
+        .chart-card { background: var(--glass); border-radius: 14px; padding: 18px; min-height: 240px; position: relative; overflow: hidden; animation: autoChange 2s infinite alternate ease-in-out; }
+        .chart-card:hover { transform: scale(1.01); }
+        canvas { transition: transform 0.4s ease; }
+        .chart-card:hover canvas { transform: scale(1.02); }
+        #particles { position: fixed; top:0; left:0; width: 100%; height: 100%; z-index: -1; }
+        .kpi { display:flex; gap:20px; flex-wrap:wrap; justify-content:center; padding:40px 10px; }
+        .kpi .item { min-width:170px; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:12px; padding:18px; text-align:center; border:1px solid rgba(255,255,255,0.03); transition: transform 0.35s ease, box-shadow 0.35s ease, background 0.4s ease; }
+        .kpi .item:hover { transform: translateY(-6px) scale(1.03); box-shadow: 0 12px 30px rgba(34,193,255,0.18); background: linear-gradient(180deg, rgba(34,193,255,0.04), rgba(74,210,155,0.02)); }
+        .kpi .num { font-size:1.9rem; color:var(--accent); font-weight:800; transition: color 0.3s ease; }
+        .kpi .item:hover .num { color: var(--accent-2); }
+        .kpi p { margin:0; color:var(--muted); }
+        .testimonials { padding:25px 20px; }
+        .testimonial-card { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding:20px; border-radius:12px; min-height:150px; transition: transform .3s, box-shadow .3s ease, background 0.4s ease; }
+        .testimonial-card:hover { transform: translateY(-6px) scale(1.02); box-shadow: 0 12px 30px rgba(2,6,23,0.6), var(--shadow-glow); background: linear-gradient(180deg, rgba(34,193,255,0.03), rgba(74,210,155,0.01)); }
+        .pricing .card { border-radius:14px; padding:26px; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.00)); border:1px solid rgba(255,255,255,0.03); transition: transform 0.35s ease, box-shadow 0.35s ease, background 0.4s ease; }
+        .pricing .card:hover { transform: translateY(-6px) scale(1.03); box-shadow: 0 12px 40px rgba(34,193,255,0.2); background: linear-gradient(180deg, rgba(34,193,255,0.03), rgba(74,210,155,0.01)); }
+        .footer-section { background-color: #2d2d2d; padding: 60px 0; }
+        .footer-top { background-color: #0000006f; padding: 10px 0; border-bottom: 1px solid #727272; }
+        .footer-top h2 { font-size: 1.8rem; font-weight: 700; margin-bottom: 15px; }
+        .footer-top .highlight { color: #ff6b35; }
+        .company-logos { display: flex; gap: 20px; }
+        .company-logos i { font-size: 2.5rem; color: #666; transition: color 0.3s ease; }
+        .company-logos i:hover { color: #ff6b35; }
+        .skills-section { background-color: #6161614b; padding: 50px 0; }
+        .skills-title { text-align: center; font-size: 2rem; font-weight: 600; margin-bottom: 40px; color: #ffffff; }
+        .skill-category h5 { color: rgb(29, 210, 255); font-weight: 600; margin-bottom: 20px; font-size: 1.1rem; }
+        .skill-category ul { list-style: none; padding: 0; }
+        .skill-category ul li { margin-bottom: 8px; color: #cccccc; transition: color 0.3s ease; cursor: pointer; }
+        .skill-category ul li:hover { color: rgb(13, 207, 255); }
+        .footer-links { background-color: #1a1a1a8f; padding: 40px 0; }
+        .footer-links h6 { color: rgb(13, 207, 255); font-weight: 600; margin-bottom: 20px; }
+        .footer-links ul { list-style: none; padding: 0; }
+        .footer-links ul li { margin-bottom: 8px; }
+        .footer-links ul li a { color: #cccccc; text-decoration: none; transition: color 0.3s ease; }
+        .footer-links ul li a:hover { color: #ff6b35; }
+        .footer-bottom { background-color: #111111; padding: 20px 0; border-top: 1px solid #444; }
+        .footer-bottom .container { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+        .brand-name { font-size: 1.5rem; font-weight: 700; color: #ffffff; }
+        .copyright { color: #888; }
+        .language-selector { background-color: transparent; border: 1px solid #666; color: #ffffff; padding: 8px 15px; border-radius: 4px; cursor: pointer; }
+        .language-selector:focus { outline: none; border-color: #ff6b35; }
+        @media (max-width: 768px) { .footer-top .d-flex { flex-direction: column; gap: 20px !important; } .company-logos { gap: 20px; } .company-logos i { font-size: 2rem; } .footer-bottom .container { flex-direction: column; gap: 15px; text-align: center; } .footer-top h2 { font-size: 1.8rem; text-align: center; } }
+        #backTop { position:fixed; right:18px; bottom:18px; z-index:999; display:flex; align-items:center; justify-content:center; width:50px; height:50px; border-radius:12px; background: rgba(255,255,255,0.04); color:#dff9ff; border:1px solid rgba(255,255,255,0.03); cursor:pointer; box-shadow: 0 8px 20px rgba(0,0,0,0.5); transition: transform .22s ease, opacity .22s ease, background 0.3s ease; }
+        #backTop:hover { transform: translateY(-6px) scale(1.1); background: rgba(34,193,255,0.15); }
+        @media (max-width:768px){ .hero h1 { font-size:2rem; } .hero p { font-size:.98rem; } .feature .icon{ width:56px;height:56px; } .kpi .item { min-width: 140px; } }
+        @keyframes autoChange { 0% { transform: scale(1); background: linear-gradient(180deg, rgba(34,193,255,0.03), rgba(74,210,155,0.01)); box-shadow: 0 4px 15px rgba(34,193,255,0.1); } 50% { transform: scale(1.03); background: linear-gradient(180deg, rgba(74,210,155,0.08), rgba(34,193,255,0.02)); box-shadow: 0 12px 25px rgba(34,193,255,0.25); } 100% { transform: scale(1); background: linear-gradient(180deg, rgba(34,193,255,0.03), rgba(74,210,155,0.01)); box-shadow: 0 4px 15px rgba(34,193,255,0.1); } }
+        .faq-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .faq-card:hover { transform: translateY(-5px); box-shadow: 0 6px 18px rgb(7, 7, 7); }
+        .faq-card h5 { color: #007bff; margin-bottom: 0.75rem; }
+        .faq-card { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(6px); border: 1px solid rgba(255, 255, 255, 0.2); }
+        .footer-top { width: 100%; padding: 30px 0; background-color: #0f1115; color: #cfeaf7; }
+        .footer-top .highlight { color: #22c1ff; }
+        .footer-top .company-logos i { margin-left: 20px; font-size: 28px; color: #cfeaf7; cursor: pointer; transition: transform 0.3s, color 0.3s; }
+        .footer-top .company-logos i:first-child { margin-left: 0px; }
+        .footer-top .company-logos i:hover { transform: scale(1.2); color: #22c1ff; }
+        .dashboard-container { font-family: Arial, sans-serif; max-width: 80%; margin: 30px auto; }
+        .dashboard-title { color: #005dba; font-size: 28px; font-weight: bold; margin-bottom: 20px; }
+        .dashboard-description { color: #9c9c9c; font-size: 16px; line-height: 1.6; margin-bottom: 30px; }
+        .dashboard-demo-link { color: #1aab59; text-decoration: none; font-size: 16px; font-weight: normal; }
+        .dashboard-demo-link:hover { text-decoration: underline; }
+    </style>
+{% endblock %}
+
+
+{% block content %}
+ 
+     <section class="hero">
+        <video autoplay muted loop playsinline poster="https://via.placeholder.com/1920x1080.png?text=Loading+Video...">
+             <source src="{{ url_for('static', filename='videos/h.mp4') }}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+
+         <canvas id="particles"></canvas>
+
+        <div class="hero-inner container" data-aos="fade-up" data-aos-duration="1000">
+            <div class="eyebrow">Enterprise Finance • Forecasting • Advisory</div>
+            <h1>AI CFO Assistant — Real-time financial insights & predictive forecasting</h1>
+            <p>
+                Ingest Excel & PDF reports with robust cleaning, analyze KPIs like revenue, burn rate, runway, perform 3–5 year forecasting
+                and get actionable advisory in plain language. Built for speed, safety and scale.
+            </p>
+
+            <div class="hero-cta">
+                 <a class="btn btn-primary-soft" href="{{ url_for('dashboard') }}"><i class="bi bi-speedometer2 me-2"></i> View Dashboard</a>
+                <a class="btn btn-outline-light" href="#features"><i class="bi bi-info-circle me-2"></i> Learn More</a>
+            </div>
+
+            <div class="d-flex gap-3 justify-content-center mt-4 flex-wrap">
+                <div class="badge bg-transparent border text-white" style="border-color:rgba(255,255,255,0.06);">Auto OCR • PDF/Table</div>
+                <div class="badge bg-transparent border text-white" style="border-color:rgba(255,255,255,0.06);">ML Forecasting</div>
+                <div class="badge bg-transparent border text-white" style="border-color:rgba(255,255,255,0.06);">Explainable Alerts</div>
+            </div>
+        </div>
+    </section>
+
+    <section id="features" class="features container">
+        <div class="row g-4">
+            <div class="col-lg-4" data-aos="fade-right" data-aos-delay="80">
+                <div class="feature p-4 h-100">
+                    <div class="icon mb-2"><i class="bi bi-upload"></i></div>
+                    <h5>Robust Ingestion</h5>
+                    <p class="text-muted">Multi-format ingestion: Excel (.xlsx/.xls), CSV, PDF (scanned & digital). Auto-table extraction, OCR, and structured cleaning for production readiness.</p>
+                </div>
+            </div>
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="160">
+                <div class="feature p-4 h-100">
+                    <div class="icon mb-2"><i class="bi bi-graph-up"></i></div>
+                    <h5>Deep Analysis</h5>
+                    <p class="text-muted">Automatic KPI detection (revenue, gross margin, liabilities, burn rate, runway) with anomaly detection and comparative trends.</p>
+                </div>
+            </div>
+            <div class="col-lg-4" data-aos="fade-left" data-aos-delay="240">
+                <div class="feature p-4 h-100">
+                    <div class="icon mb-2"><i class="bi bi-chat-dots"></i></div>
+                    <h5>Advisory & Explainability</h5>
+                    <p class="text-muted">Conversation-first advisor that provides why-it-matters explanations, impact estimates and recommended next steps (rebalance, renegotiate, monitor).</p>
+                </div>
+            </div>
+        </div>
+        <div class="row g-4 mt-4">
+            <div class="col-md-6" data-aos="fade-right">
+                <div class="feature p-4">
+                    <div class="icon"><i class="bi bi-journal-check"></i></div>
+                    <h5>Audit Trail & Validation</h5>
+                    <p class="text-muted">Track transformations, flagged cells and ingestion confidence scores to maintain compliance and reproducibility.</p>
+                </div>
+            </div>
+            <div class="col-md-6" data-aos="fade-left">
+                <div class="feature p-4">
+                    <div class="icon"><i class="bi bi-shield-lock"></i></div>
+                    <h5>Enterprise Security</h5>
+                    <p class="text-muted">Encryption at rest & transit, role-based access and integrations for SSO and secure data export.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+     <section id="dashboard" class="dashboard container">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 data-aos="fade-right">Dashboard Preview</h3>
+        </div>
+  <div class="row gy-4">
+    <div class="col-lg-4" data-aos="fade-up" data-aos-delay="80">
+      <div class="chart-card">
+        <h6 class="mb-3">Revenue Growth</h6>
+        <canvas id="revenueChart" height="220"></canvas>
+      </div>
+    </div>
+
+    <div class="col-lg-4" data-aos="fade-up" data-aos-delay="160">
+      <div class="chart-card">
+        <h6 class="mb-3">Profitability (Gross Margin)</h6>
+        <canvas id="marginChart" height="220"></canvas>
+      </div>
+    </div>
+
+    <div class="col-lg-4" data-aos="fade-up" data-aos-delay="240">
+      <div class="chart-card">
+        <h6 class="mb-3">Cash Flow (Quarterly)</h6>
+        <canvas id="cashChart" height="220"></canvas>
+      </div>
+    </div>
+
+     <div class="col-lg-4" data-aos="fade-up" data-aos-delay="320">
+      <div class="chart-card">
+        <h6 class="mb-3">Burn Rate</h6>
+        <canvas id="burnChart" height="220"></canvas>
+      </div>
+    </div>
+
+    <div class="col-lg-4" data-aos="fade-up" data-aos-delay="400">
+      <div class="chart-card">
+        <h6 class="mb-3">Cash Reserve</h6>
+        <canvas id="reserveChart" height="220"></canvas>
+      </div>
+    </div>
+
+    <div class="col-lg-4" data-aos="fade-up" data-aos-delay="480">
+      <div class="chart-card">
+        <h6 class="mb-3">Risk Rate</h6>
+        <canvas id="riskChart" height="220"></canvas>
+      </div>
+    </div>
+  </div>
+    </section>
+
+    <section>
+        <div class="dashboard-container">
+            <h2 class="dashboard-title">CFO Dashboard</h2>
+            <p class="dashboard-description">    A CFO dashboard needs to integrate data from multiple systems to give a complete picture of an organization’s performance. This example for a healthcare organization combines data from patient records, finance and operational systems to present cost profiles for physicians and even allows a CFO or their team to drill down to an individual patient level and the resources which were used to treat those patients.
+</p>
+            <a href="#" class="dashboard-demo-link">Try CFO Dashboard Demo</a>
+        </div>
+        <div>
+             <img src="{{ url_for('static', filename='images/new.png') }}" style="width: 75%;height: 95vh; margin: auto;"class="rounded mx-auto d-block mb-4 shadow-lg" alt=""> 
+            <hr style="width:90%; margin: 0px auto 20px auto; border: 1px solid #ababab; border-radius: 2px;">
+            <img src="{{ url_for('static', filename='images/Screenshot 2025-09-17 182126.png') }}" style="width: 75%;height: 80vh; margin: auto;"class="rounded mx-auto d-block mb-4 shadow-lg" alt="">
+            <hr style="width:90%; margin: 0px auto 20px auto; border: 1px solid #ababab; border-radius: 2px;">
+            <img src="{{ url_for('static', filename='images/Screenshot 2025-09-17 182346.png') }}" style="width: 75%;height: 85vh; margin: auto;"class="rounded mx-auto d-block mb-4 shadow-lg" alt="">
+            <hr style="width:90%; margin: 0px auto 20px auto; border: 1px solid #ababab; border-radius: 2px;">
+            <img src="{{ url_for('static', filename='images/Screenshot 2025-09-17 181311.png') }}" style="width: 75%;height: 85vh; margin: auto;" class="rounded mx-auto d-block mb-4 shadow-lg"alt="">
+            <hr style="width:90%; margin: 0px auto 20px auto; border: 1px solid #ababab; border-radius: 2px;">
+            <img src="{{ url_for('static', filename='images/127.0.0.1_5000_ (3).png') }}" style="width: 75%;height: 115vh; margin: auto;"class="rounded mx-auto d-block mb-4" alt="">
+        </div>
+    </section>
+
+     <section id="kpis" class="container py-5">
+   <div class="text-center mb-4 text-shadow-black" data-aos="fade-up">
+    <h3>Key Performance Metrics</h3>
+    <p class="text-muted">Live examples — numbers animate into view</p>
+  </div>
+
+  <div class="kpi justify-content-center" data-aos="fade-up" data-aos-delay="100">
+    <div class="item text-center me-3" data-aos="zoom-in" data-aos-delay="150">
+      <div class="num" data-target="1200">0</div>
+      <p class="text-muted small">Clients Analyzed</p>
+    </div>
+    <div class="item text-center me-3" data-aos="zoom-in" data-aos-delay="200">
+      <div class="num" data-target="98">0</div>
+      <p class="text-muted small">Model Accuracy (%)</p>
+    </div>
+    <div class="item text-center me-3" data-aos="zoom-in" data-aos-delay="250">
+      <div class="num" data-target="350">0</div>
+      <p class="text-muted small">Reports Processed</p>
+    </div>
+    <div class="item text-center" data-aos="zoom-in" data-aos-delay="300">
+      <div class="num" data-target="5">0</div>
+      <p class="text-muted small">Years Forecast</p>
+    </div>
+  </div>
+    </section>
+
+     <section class="testimonials container">
+     <hr style="width:90%; margin: 0px auto 90px auto; border: 1px solid #ababab; border-radius: 2px;">
+
+  <div class="text-center mb-4 text-shadow-black" data-aos="fade-up"><h3>Trusted by finance leaders</h3></div>
+
+  <div id="testiCarousel" class="carousel slide" data-bs-ride="carousel" data-aos="fade-up" data-aos-delay="100">
+    <div class="carousel-inner">
+      <div class="carousel-item active">
+        <div class="testimonial-card p-4">
+          <p class="mb-2">"AI CFO reduced our monthly close time by 60% and flagged anomalies before they became issues."</p>
+          <div class="fw-bold">— Jane Doe, CFO, FinOps Co.</div>
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="testimonial-card p-4">
+          <p class="mb-2">"The forecasting module helped us secure a bridge round by showing a credible 18-month runway scenario."</p>
+          <div class="fw-bold">— Rajeev M, CEO, ScaleUp</div>
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="testimonial-card p-4">
+          <p class="mb-2">"Actionable advisory with clear 'why it matters' notes — a must-have for our board pack."</p>
+          <div class="fw-bold">— Aisha K, Head of Finance, VentureCo</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="carousel-control-prev" type="button" data-bs-target="#testiCarousel" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon"></span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#testiCarousel" data-bs-slide="next">
+      <span class="carousel-control-next-icon"></span>
+    </button>
+  </div>
+    </section>
+
+     <section id="pricing" class="container py-5">
+   <div class="text-center mb-4 shadow-lg" data-aos="fade-up"><h3>Pricing</h3><p class="text-muted">Flexible plans for startups up to enterprises</p></div>
+  <div class="row g-4">
+    <div class="col-md-4" data-aos="fade-up" data-aos-delay="80">
+      <div class="card p-4 hover-glow">
+        <h5>Starter</h5>
+        <div class="display-6 my-3">$19<span class="fs-6">/mo</span></div>
+        <ul class="list-unstyled text-muted">
+          <li>Basic ingestion</li>
+          <li>Standard analytics</li>
+          <li>Email support</li>
+        </ul>
+        <a class="btn btn-outline-light mt-3" href="#">Choose</a>
+      </div>
+    </div>
+
+    <div class="col-md-4" data-aos="fade-up" data-aos-delay="160">
+      <div class="card p-4 border-2 hover-glow" style="border-color: rgba(34,193,255,0.08);">
+        <h5>Pro</h5>
+        <div class="display-6 my-3">$49<span class="fs-6">/mo</span></div>
+        <ul class="list-unstyled text-muted">
+          <li>Advanced ingestion</li>
+          <li>Forecasting & advisory</li>
+          <li>Priority support</li>
+        </ul>
+        <a class="btn btn-primary-soft mt-3" href="#">Get Pro</a>
+      </div>
+    </div>
+
+    <div class="col-md-4" data-aos="fade-up" data-aos-delay="240">
+      <div class="card p-4 hover-glow">
+        <h5>Enterprise</h5>
+        <div class="display-6 my-3">Custom</div>
+        <ul class="list-unstyled text-muted">
+          <li>Dedicated instance</li>
+          <li>Custom integrations</li>
+          <li>SLAs & onboarding</li>
+        </ul>
+        <a class="btn btn-outline-light mt-3" href="#">Contact Sales</a>
+      </div>
+    </div>
+  </div>
+    </section>
+
+     <section id="faq" class="py-5 ">
+     <hr style="width:90%; margin: 0px auto 90px auto; border: 1px solid #ababab; border-radius: 2px;">
+
+  <div class="container">
+    <h2 class="text-center mb-5 shadow-lg">Frequently Asked Questions</h2>
+    <div class="row g-4">
+      
+      <div class="col-md-6">
+        <div class="faq-card p-4 shadow-sm rounded bg-white h-100">
+          <h5>What is AI CFO Agent?</h5>
+          <p class="text-muted">
+            AI CFO Agent is a smart financial assistant that provides real-time insights, 
+            automated reporting, and predictive analysis for better decision-making.
+          </p>
+        </div>
+      </div>
+      
+      <div class="col-md-6">
+        <div class="faq-card p-4 shadow-sm rounded bg-white h-100">
+          <h5>Is my financial data secure?</h5>
+          <p class="text-muted">
+            Yes, all data is encrypted and stored securely using industry-standard best practices.
+          </p>
+        </div>
+      </div>
+      
+      <div class="col-md-6">
+        <div class="faq-card p-4 shadow-sm rounded bg-white h-100">
+          <h5>Can I integrate my existing tools?</h5>
+          <p class="text-muted">
+            Absolutely! AI CFO Agent integrates with accounting software, CRMs, and other finance tools seamlessly.
+          </p>
+        </div>
+      </div>
+      
+      <div class="col-md-6">
+        <div class="faq-card p-4 shadow-sm rounded bg-white h-100">
+          <h5>Do I need technical knowledge to use it?</h5>
+          <p class="text-muted">
+            Not at all! The platform is designed for business users with an intuitive dashboard and clear reports.
+          </p>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+    </section>
+
+     <div class="footer-top w-100">
+     <div class="container-fluid">
+      <div class="d-flex align-items-center justify-content-between flex-wrap company-logos-wrapper">
+        <h2 class="mb-3 mb-md-0"><span style="font-weight: 400;">Leading enterprises choose </span>
+            <span class="highlight">AI CFO</span><span style="font-weight: 400;"> Agent to optimize financial operations.</span>  
+        </h2>
+        <div class="company-logos d-flex align-items-center">
+          <i class="fab fa-google" title="Google"></i>
+          <i class="fab fa-microsoft" title="Microsoft"></i>
+          <i class="fab fa-apple" title="Apple"></i>
+           <i class="fab fa-meta" title="Meta"></i>
+        </div>
+      </div>
+    </div>
+    </div>
+    <div class="skills-section">
+ <div class="container">
+    <h3 class="skills-title">Explore AI-powered financial services and expertise</h3>
+    <div class="row">
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="skill-category">
+                <h5>Financial Analysis</h5>
+                <ul>
+                    <li>Cash Flow Analysis</li>
+                    <li>Profit & Loss Reports</li>
+                    <li>Budget Planning</li>
+                    <li>Financial Forecasting</li>
+                    <li>Variance Analysis</li>
+                    <li>ROI Calculations</li>
+                    <li>Cost Analysis</li>
+                    <li>See all Services</li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="skill-category">
+                <h5>Risk Management</h5>
+                <ul>
+                    <li>Credit Risk Assessment</li>
+                    <li>Market Risk Analysis</li>
+                    <li>Compliance Monitoring</li>
+                    <li>Fraud Detection</li>
+                    <li>Risk Modeling</li>
+                    <li>Stress Testing</li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="skill-category">
+                <h5>Investment Advisory</h5>
+                <ul>
+                    <li>Portfolio Optimization</li>
+                    <li>Asset Allocation</li>
+                    <li>Investment Strategy</li>
+                    <li>Performance Analytics</li>
+                    <li>Market Intelligence</li>
+                    <li>Due Diligence</li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="skill-category">
+                <h5>Strategic Planning</h5>
+                <ul>
+                    <li>Financial Modeling</li>
+                    <li>Scenario Planning</li>
+                    <li>Business Valuation</li>
+                    <li>M&A Analysis</li>
+                    <li>Capital Structure</li>
+                    <li>Growth Strategy</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+    </div>
+    <div class="footer-links">
+ <div class="container">
+            <div class="row">
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h6>AI CFO Agent</h6>
+                    <ul>
+                        <li><a href="#about">About AI CFO</a></li>
+                        <li><a href="#demo">Request Demo</a></li>
+                        <li><a href="#app">Get the App</a></li>
+                        <li><a href="#contact">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h6>Resources</h6>
+                    <ul>
+                        <li><a href="#careers">Careers</a></li>
+                        <li><a href="#blog">Blog</a></li>
+                        <li><a href="#help">Help & Support</a></li>
+                        <li><a href="#partners">Partners</a></li>
+                        <li><a href="#investors">Investors</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h6>Legal</h6>
+                    <ul>
+                        <li><a href="#terms">Terms of Service</a></li>
+                        <li><a href="#privacy">Privacy Policy</a></li>
+                        <li><a href="#cookies">Cookie Settings</a></li>
+                        <li><a href="#sitemap">Sitemap</a></li>
+                        <li><a href="#accessibility">Accessibility</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h6>Industries</h6>
+                    <ul>
+                        <li><a href="#fintech">FinTech</a></li>
+                        <li><a href="#healthcare">Healthcare</a></li>
+                        <li><a href="#manufacturing">Manufacturing</a></li>
+                        <li><a href="#retail">Retail</a></li>
+                        <li><a href="#tech">Technology</a></li>
+                        <li><a href="#consulting">Consulting</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="footer-bottom">
+ <div class="container">
+    <div class="brand-name">AI CFO Agent</div>
+    <div class="copyright">© 2025 AI CFO Solutions, Inc.</div>
+    <div>
+        <select class="language-selector">
+            <option value="en">🌐 English</option>
+            <option value="es">🌐 Español</option>
+            <option value="fr">🌐 Français</option>
+            <option value="de">🌐 Deutsch</option>
+            <option value="zh">🌐 中文</option>
+        </select>
+    </div>
+</div>
+
+    </div>
+
+     <div id="backTop" title="Back to top" style="display:none"><i class="bi bi-arrow-up"></i></div>
+{% endblock %}
+
+
+{% block scripts %}
+     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script>
+         AOS.init({ duration: 1000, once: true, easing: 'ease-in-out' });
+
+         const nav = document.getElementById('mainNav'); 
+        const backTop = document.getElementById('backTop');
+
+        window.addEventListener('scroll', () => {
+             const mainNav = document.querySelector('.navbar'); 
+            if (mainNav) {
+                if (window.scrollY > 20) mainNav.classList.add('scrolled');
+                else mainNav.classList.remove('scrolled');
+            }
+            if (backTop) backTop.style.display = window.scrollY > 600 ? 'flex' : 'none';
+        });
+
+ document.querySelectorAll('a.nav-link, a.btn-outline-light, a.btn-primary-soft').forEach(el => {
+    el.addEventListener('click', e => {
+      const href = el.getAttribute('href');
+      if (href && href.startsWith('#')) {
+        e.preventDefault();
+        const section = document.querySelector(href);
+        if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+
+  if (backTop) {
+    backTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  }
+
+   const counters = document.querySelectorAll('.num');
+  counters.forEach(counter => {
+    const animate = () => {
+      const target = +counter.getAttribute('data-target');
+      const count = +counter.innerText;
+      const increment = target / 200;
+      if (count < target) {
+        counter.innerText = Math.ceil(count + increment);
+        setTimeout(animate, 50);
+      } else counter.innerText = target;
+    };
+    animate();
+  });
+
+   (function () {
+    const canvas = document.getElementById('particles');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let w = (canvas.width = innerWidth);
+    let h = (canvas.height = innerHeight);
+    const particles = [];
+    const count = Math.floor((w * h) / 70000) + 25;
+
+    window.addEventListener('resize', () => {
+      w = canvas.width = innerWidth;
+      h = canvas.height = innerHeight;
+    });
+
+    function rand(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+    function Particle() {
+      this.x = rand(0, w);
+      this.y = rand(0, h);
+      this.r = rand(0.7, 2.2);
+      this.vx = rand(-0.25, 0.25);
+      this.vy = rand(-0.2, 0.2);
+      this.alpha = rand(0.05, 0.18);
+    }
+
+    for (let i = 0; i < count; i++) particles.push(new Particle());
+
+    function draw() {
+      ctx.clearRect(0, 0, w, h);
+      for (let p of particles) {
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.x < -10) p.x = w + 10;
+        if (p.x > w + 10) p.x = -10;
+        if (p.y < -10) p.y = h + 10;
+        if (p.y > h + 10) p.y = -10;
+        ctx.beginPath();
+        ctx.fillStyle = 'rgba(34,193,255,' + p.alpha + ')';
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      requestAnimationFrame(draw);
+    }
+    draw();
+  })();
+
+   function createRevenueChart() {
+    const canvas = document.getElementById('revenueChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    return new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['2019', '2020', '2021', '2022', '2023', '2024'],
+        datasets: [{
+          label: 'Revenue (₹k)',
+          data: [120, 160, 270, 440, 780, 1220],
+          borderColor: 'rgba(34,193,255,0.95)',
+          backgroundColor: 'rgba(34,193,255,0.12)',
+          tension: 0.36,
+          pointRadius: 3,
+          borderWidth: 2,
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        animation: false,
+        plugins: { legend: { display: true, labels: { color: '#cfeaf7' } } },
+        scales: {
+          x: { ticks: { color: '#9fbfce' }, grid: { color: 'rgba(255,255,255,0.03)' } },
+          y: { beginAtZero: false, suggestedMin: 100, suggestedMax: 1300, ticks: { color: '#9fbfce' }, grid: { color: 'rgba(255,255,255,0.03)' } }
+        }
+      }
+    });
+  }
+
+  function createMarginChart() {
+    const canvas = document.getElementById('marginChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    return new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+        datasets: [{
+          label: 'Gross Margin %',
+          data: [28, 33, 30, 35],
+          backgroundColor: 'rgba(74,210,155,0.9)',
+          borderRadius: 6,
+          barPercentage: 0.6
+        }]
+      },
+      options: {
+        animation: { duration: 1500, easing: 'easeOutCubic' },
+        plugins: { legend: { display: false } },
+        scales: { x: { ticks: { color: '#9fbfce' } }, y: { min: 25, max: 40, ticks: { color: '#9fbfce' } } }
+      }
+    });
+  }
+
+  function createCashChart() {
+    const canvas = document.getElementById('cashChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    return new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Jan', 'Apr', 'Jul', 'Oct'],
+        datasets: [{
+          label: 'Net Cash (₹k)',
+          data: [320, -120, 200, 280],
+          backgroundColor: (context) =>
+            context.dataset.data[context.dataIndex] < 0
+              ? 'rgba(255,110,110,0.9)'
+              : 'rgba(34,193,255,0.9)',
+          borderRadius: 6
+        }]
+      },
+      options: {
+        animation: { duration: 1500, easing: 'easeOutCubic' },
+        plugins: { legend: { display: false } },
+        scales: { x: { ticks: { color: '#9fbfce' } }, y: { min: -150, max: 350, ticks: { color: '#9fbfce' } } }
+      }
+    });
+  }
+
+  function createBurnChart() {
+    const canvas = document.getElementById('burnChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    return new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr'],
+        datasets: [{
+          label: 'Burn Rate (₹k)',
+          data: [120, 140, 135, 150],
+          borderColor: 'rgba(255,99,132,0.95)',
+          backgroundColor: 'rgba(255,99,132,0.15)',
+          tension: 0.3,
+          pointRadius: 4,
+          borderWidth: 2,
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        animation: { duration: 1500, easing: 'easeOutCubic' },
+        plugins: { legend: { display: true, labels: { color: '#cfeaf7' } } },
+        scales: {
+          x: { ticks: { color: '#9fbfce' } },
+          y: { min: 100, max: 160, ticks: { color: '#9fbfce' } }
+        }
+      }
+    });
+  }
+
+  function createReserveChart() {
+    const canvas = document.getElementById('reserveChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    return new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['2019', '2020', '2021', '2022', '2023'],
+        datasets: [{
+          label: 'Cash Reserve (₹k)',
+          data: [600, 720, 850, 900, 1100],
+          backgroundColor: 'rgba(54,162,235,0.9)',
+          borderRadius: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        animation: { duration: 1500, easing: 'easeOutCubic' },
+        plugins: { legend: { display: true, labels: { color: '#cfeaf7' } } },
+        scales: {
+          x: { ticks: { color: '#9fbfce' } },
+          y: { min: 500, max: 1200, ticks: { color: '#9fbfce' } }
+        }
+      }
+    });
+  }
+
+  function createRiskChart() {
+    const canvas = document.getElementById('riskChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    return new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+        datasets: [{
+          label: 'Risk Rate %',
+          data: [12, 18, 15, 22],
+          borderColor: 'rgba(255,87,51,0.95)',
+          backgroundColor: 'rgba(255,87,51,0.15)',
+          tension: 0.35,
+          pointRadius: 4,
+          borderWidth: 2,
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        animation: { duration: 1500, easing: 'easeOutCubic' },
+        plugins: { legend: { display: true, labels: { color: '#cfeaf7' } } },
+        scales: {
+          x: { ticks: { color: '#9fbfce' } },
+          y: { min: 0, max: 30, ticks: { color: '#9fbfce' } }
+        }
+      }
+    });
+  }
+
+   const chartObserver = new IntersectionObserver((entries, obs) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        if (entry.target.id === 'revenueChart') createRevenueChart();
+        if (entry.target.id === 'marginChart') createMarginChart();
+        if (entry.target.id === 'cashChart') createCashChart();
+        if (entry.target.id === 'burnChart') createBurnChart();
+        if (entry.target.id === 'reserveChart') createReserveChart();
+        if (entry.target.id === 'riskChart') createRiskChart();
+        obs.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.5 });
+
+  document.querySelectorAll('#revenueChart,#marginChart,#cashChart,#burnChart,#reserveChart,#riskChart')
+    .forEach(el => chartObserver.observe(el));
+
+   const yearEl = document.getElementById('year');
+  if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+         document.addEventListener('DOMContentLoaded', function() {
+             const skillItems = document.querySelectorAll('.skill-category ul li');
+            skillItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    if (this.textContent.includes('See all')) {
+                        alert('Redirecting to all ' + this.closest('.skill-category').querySelector('h5').textContent + ' services...');
+                    } else {
+                        alert('Learn more about: ' + this.textContent);
+                    }
+                });
+            });
+
+             const languageSelector = document.querySelector('.language-selector');
+            languageSelector.addEventListener('change', function() {
+                alert('Language changed to: ' + this.options[this.selectedIndex].text);
+            });
+
+             const companyLogos = document.querySelectorAll('.company-logos i');
+            companyLogos.forEach(logo => {
+                logo.addEventListener('click', function() {
+                    alert('Case study for ' + this.getAttribute('title') + ' coming soon!');
+                });
+            });
+        });
+
+    </script>
+{% endblock %}

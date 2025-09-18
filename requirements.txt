@@ -1,0 +1,236 @@
+# Core Flask dependencies
+Flask==2.3.3
+Flask-Session==0.5.0
+Werkzeug==2.3.7
+
+# Data processing and analysis
+pandas==2.1.1
+numpy==1.24.3
+scipy==1.11.3
+
+# Machine Learning
+scikit-learn==1.3.0
+
+# Data visualization
+plotly==5.17.0
+
+# PDF processing
+pdfplumber==0.10.3
+PyMuPDF==1.23.8
+
+# Excel processing
+openpyxl==3.1.2
+xlrd==2.0.1
+
+# Image processing (optional for OCR)
+Pillow==10.0.1
+
+# Environment variables
+python-dotenv==1.0.0
+
+# NLP processing
+textblob==0.17.1
+
+# Optional dependencies (install only if needed)
+# google-generativeai>=0.3.0  # For Gemini AI
+# pytesseract>=0.3.10         # For OCR
+# camelot-py[cv]==0.11.0      # For table extraction
+# tabula-py>=2.8.0            # Alternative table extraction
+# prophet>=1.1.4              # For forecasting
+# yfinance>=0.2.0             # For financial data
+# joblib>=1.3.0               # For model persistence
+
+reportlab==4.0.4
+kaleido==0.2.1
+
+
+
+
+
+# Web Framework
+Flask==2.3.3
+Flask-Session==0.5.0
+Flask-SQLAlchemy==3.0.5
+Werkzeug==2.3.7
+
+# Environment and Configuration
+python-dotenv==1.0.0
+
+# Data Processing and Analysis
+pandas==2.1.3
+numpy==1.24.4
+openpyxl==3.1.2
+
+# Machine Learning and Statistics
+scikit-learn==1.3.2
+textblob==0.17.1
+
+# Time Series Forecasting (Optional - fallback to sklearn if not available)
+prophet==1.1.4
+
+# PDF Processing
+pdfplumber==0.9.0
+PyMuPDF==1.23.8
+
+# Image Processing and OCR
+Pillow==10.1.0
+pytesseract==0.3.10
+
+# Data Visualization
+plotly==5.17.0
+
+# Report Generation
+reportlab==4.0.7
+
+# String Similarity (Optional - has pure Python fallback)
+python-Levenshtein==0.23.0
+
+# HTTP Requests (for Ollama integration)
+requests==2.31.0
+
+# Database
+SQLAlchemy==2.0.23
+
+# Additional utilities that might be needed
+Jinja2==3.1.2
+MarkupSafe==2.1.3
+click==8.1.7
+itsdangerous==2.1.2
+blinker==1.7.0
+
+# For Excel file handling
+et-xmlfile==1.1.0
+
+# For CSV and data format handling
+charset-normalizer==3.3.2
+urllib3==2.1.0
+certifi==2023.11.17
+
+# Math and scientific computing support
+scipy==1.11.4
+
+# Date handling
+python-dateutil==2.8.2
+pytz==2023.3
+
+# Additional dependencies for plotly and data visualization
+tenacity==8.2.3
+packaging==23.2
+
+# For concurrent processing
+concurrent-futures==3.1.1
+
+# ==============================================================================
+# Requirements for the AI CFO Assistant Application
+# ==============================================================================
+# This file lists all Python packages and external system dependencies.
+#
+# SETUP INSTRUCTIONS:
+# -------------------
+# 1. Install System-Level Dependencies (Ollama, Tesseract).
+# 2. Create and activate a Python virtual environment.
+# 3. Install all Python packages using: pip install -r requirements.txt
+# 4. Download the required Ollama model.
+# ==============================================================================
+
+# ==============================================================================
+# SECTION 1: EXTERNAL & SYSTEM-LEVEL DEPENDENCIES
+# ==============================================================================
+# These are NOT Python packages. They must be installed on your system separately.
+
+# -- Ollama AI Engine --
+# The application requires the Ollama application to be running in the background
+# to serve the large language model.
+# 1. Download and install from the official website: https://ollama.com/
+# 2. After installation, ensure the Ollama service is running.
+
+# -- Tesseract OCR Engine --
+# Required for the 'pytesseract' library to perform Optical Character Recognition (OCR) on images.
+# !! IMPORTANT !!: This is a system-level installation.
+# Follow the instructions for your OS here: https://tesseract-ocr.github.io/tessdoc/Installation.html
+
+
+# ==============================================================================
+# SECTION 2: PYTHON PACKAGES (Install with pip)
+# ==============================================================================
+
+# -- Core Web Framework & Server --
+# Flask is the micro web framework used to build the application.
+Flask==3.0.3
+# Flask-Session handles server-side sessions to store user and report data.
+Flask-Session==0.8.0
+# Flask-SQLAlchemy provides an Object-Relational Mapper (ORM) for database interactions.
+Flask-SQLAlchemy==3.1.1
+# Werkzeug is a core dependency for Flask, providing request/response utilities.
+Werkzeug==3.0.3
+# Gunicorn is a production-ready web server, recommended over Flask's built-in server for deployment.
+gunicorn==22.0.0
+
+# -- Environment & Configuration --
+# python-dotenv is used to manage environment variables by reading from a .env file.
+python-dotenv==1.0.1
+
+# -- Data Handling and Numerics --
+# pandas is essential for data manipulation, especially for handling tabular data from Excel/CSV.
+pandas==2.2.2
+# numpy is a fundamental package for numerical computation and a core dependency for pandas.
+numpy==1.26.4
+# openpyxl is required by pandas to read and write modern Excel files (.xlsx).
+openpyxl==3.1.5
+
+# -- PDF and File Processing --
+# pdfplumber is used for extracting text and tables from PDF files.
+pdfplumber==0.11.1
+# PyMuPDF (imported as 'fitz') is a high-performance library for PDF text/image extraction.
+PyMuPDF==1.24.7
+# Pillow (PIL Fork) is the Python Imaging Library, used for opening, manipulating, and saving image files.
+# It is a dependency for pytesseract to handle images extracted from PDFs.
+Pillow==10.4.0
+
+# -- Optical Character Recognition (OCR) --
+# pytesseract is a Python wrapper for Google's Tesseract-OCR Engine.
+# Note: This library requires the system-level Tesseract installation from Section 1.
+pytesseract==0.3.10
+
+# -- Natural Language Processing (NLP) and Machine Learning (ML) --
+# textblob provides a simple API for common NLP tasks.
+textblob==0.18.0.post0
+# scikit-learn is the core machine learning library for regression and other models.
+scikit-learn==1.5.1
+# prophet is a forecasting library by Facebook, used for time-series predictions.
+# Note: Prophet can be complex to install. If you encounter issues,
+# please consult the official documentation: https://facebook.github.io/prophet/docs/installation.html
+prophet==1.1.5
+
+# -- API Requests and Utilities --
+# requests is used for making HTTP requests, specifically to the Ollama API.
+requests==2.32.3
+# python-levenshtein is used for fast computation of string similarity (Levenshtein distance).
+python-levenshtein==0.25.1
+
+# -- PDF/Excel Reporting and Data Visualization --
+# reportlab is used to generate PDF documents programmatically.
+reportlab==4.2.0
+# plotly is used for creating interactive, publication-quality charts and graphs.
+plotly==5.22.0
+# kaleido is required by Plotly to export charts to static images (e.g., for embedding in PDFs).
+kaleido==0.2.1
+
+# ==============================================================================
+# SECTION 3: OLLAMA MODEL DOWNLOAD
+# ==============================================================================
+# After installing Ollama (from Section 1) and ensuring it is running,
+# you must download the language model used by the application.
+#
+# Open your terminal and run the following command:
+#
+# For the default model used in the code (recommended):
+#   ollama run llama2:7b-chat
+#
+# The user-requested model 'llama2:bits-7' appears to be a typo.
+# A common alternative is 'llama2:7b'. To use that, run:
+#   ollama run llama2:7b
+#
+# This command will download several gigabytes of data.
+# Once complete, the model will be available for the Flask application to use.
+# ==============================================================================
