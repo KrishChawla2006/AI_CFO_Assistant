@@ -1,5 +1,5 @@
 AI CFO Assistant: Financial Document Analysis & Reporting
-![alt text](https://img.shields.io/badge/License-MIT-yellow.svg)
+
 The AI CFO Assistant is a powerful web application designed to automate the extraction, analysis, and interpretation of financial data from documents like PDFs and spreadsheets. It leverages advanced data ingestion, machine learning, and AI-powered insights (via Ollama) to provide users with a comprehensive financial dashboard, risk assessment, trend forecasting, and an interactive chat assistant.
 ✨ Key Features
 Multi-Format Document Upload: Ingest financial reports in PDF, Excel (.xlsx, .xls), and CSV formats.
